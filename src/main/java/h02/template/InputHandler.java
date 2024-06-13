@@ -46,6 +46,7 @@ public class InputHandler {
 
     /**
      * Returns the next input from the input queue. If the input is invalid, the user will be prompted to enter a new input.
+     * The program will halt until a valid input is entered.
      *
      * @return the next input from the input queue
      */
