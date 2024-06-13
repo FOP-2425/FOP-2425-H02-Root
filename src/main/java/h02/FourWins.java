@@ -3,6 +3,7 @@ package h02;
 import fopbot.Robot;
 import fopbot.World;
 import h02.template.InputHandler;
+import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
 /**
@@ -41,6 +42,7 @@ public class FourWins {
      * @param y the y-coordinate of the field
      * @return true if the field is occupied by a robot, false otherwise
      */
+    @DoNotTouch
     public static boolean isOccupied(final int x, final int y) {
         return World.getGlobalWorld().getField(x, y).getEntities().stream().anyMatch(Robot.class::isInstance);
     }
