@@ -28,7 +28,7 @@ public class FourWins {
 
 
     /**
-     * Switches the player for each  asdfturn. If the current player is SQUARE_BLUE, SQUARE_RED is returned as the next
+     * Switches the player for each turn. If the current player is SQUARE_BLUE, SQUARE_RED is returned as the next
      * player. If the current player is SQUARE_RED, SQUARE_BLUE is returned as the next player.
      *
      * @param currentPlayer The player color of the current player.
@@ -41,13 +41,20 @@ public class FourWins {
     }
 
     /**
-     * Displays the winner of the game by printing the winning color in the console.
+     * Displays the winner of the game by printing the winning color in the console and filling the whole field
+     * with Robots of the winning color.
      *
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
     void displayWinner(final RobotFamily winner) {
         System.out.println("Player of color " + winner + " wins the game!");
+
+        for (int x = 0; x < World.getWidth(); x++) {
+            for (int y = 0; y < World.getHeight(); y++) {
+                new Robot(x, y, winner);
+            }
+        }
     }
 
     /**
