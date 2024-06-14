@@ -12,8 +12,6 @@ import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
 public class FourWins {
-    //TODO: implement 4
-
     private final InputHandler inputHandler = new InputHandler(this);
 
     void startGame() {
