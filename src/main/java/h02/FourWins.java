@@ -8,6 +8,8 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
+import java.awt.*;
+
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
@@ -52,7 +54,7 @@ public class FourWins {
 
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
-                new Robot(x, y, winner);
+                World.getGlobalWorld().setFieldColor(x, y, winner == RobotFamily.SQUARE_BLUE ? Color.BLUE : Color.RED);
             }
         }
     }
