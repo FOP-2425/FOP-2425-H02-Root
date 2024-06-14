@@ -28,11 +28,55 @@ public class FourWins {
         inputHandler.install();
     }
 
+
+    /**
+     * Switches the player for each  asdfturn. If the current player is SQUARE_BLUE, SQUARE_RED is returned as the next
+     * player. If the current player is SQUARE_RED, SQUARE_BLUE is returned as the next player.
+     *
+     * @param currentPlayer The player color of the current player.
+     * @return The player color of the next player.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    RobotFamily switchPlayer(final RobotFamily currentPlayer) {
+        if (currentPlayer == RobotFamily.SQUARE_BLUE) return RobotFamily.SQUARE_RED;
+        return RobotFamily.SQUARE_BLUE;
+    }
+
+    /**
+     * Displays the winner of the game by printing the winning color in the console.
+     *
+     * @param winner The RobotFamily color of the winner.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    void displayWinner(final RobotFamily winner) {
+        System.out.println("Player of color " + winner + " wins the game!");
+    }
+
+    /**
+     * Executes the main game loop, handling player turns, coin drops, and win condition checks.
+     * This method initializes the game board as a 2D array of RobotFamily colors, representing
+     * the slots that can be filled with players' coins. It starts with a predefined currentPlayer
+     * and continues in a loop until a win condition is met. Each iteration of the loop waits for
+     * player input to select a column to drop a coin into, switches the current player, drops the
+     * coin in the selected column, and checks for win conditions. If a win condition is met, the
+     * loop ends, and the winner is displayed.
+     */
+    @StudentImplementationRequired("H2.2.4")
     void gameLoop() {
-        final boolean finished = false;
+        final RobotFamily[][] coins = new RobotFamily[World.getHeight()][World.getWidth()];
+        RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
+
+        boolean finished = false;
         while (!finished) {
             final int column = inputHandler.getNextInput();
-            // TODO: place robot
+
+            currentPlayer = switchPlayer(currentPlayer);
+            dropCoin(column, coins, currentPlayer);
+            finished = testWinConditions(coins, currentPlayer);
+        }
+
+        displayWinner(currentPlayer);
+    }
 
     /**
      * Calculates the next unoccupied row index in the specified column. This row index is the next destination for a
