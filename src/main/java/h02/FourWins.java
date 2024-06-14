@@ -140,6 +140,12 @@ public class FourWins {
         return World.getGlobalWorld().getField(x, y).getEntities().stream().anyMatch(Robot.class::isInstance);
     }
 
+    /**
+     * Validates if a given column index is within the bounds of the game board and not fully occupied.
+     *
+     * @param column The column index to validate.
+     * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
+     */
     @StudentImplementationRequired("H2.2.1")
     public boolean validateInput(final int column) {
         if (column < 0 || column >= World.getWidth()) {
