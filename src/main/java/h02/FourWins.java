@@ -23,7 +23,7 @@ public class FourWins {
 
     void setupWorld() {
         World.setSize(7, 6);
-        World.setDelay(0);
+        World.setDelay(10);
         World.setVisible(true);
         inputHandler.install();
     }
