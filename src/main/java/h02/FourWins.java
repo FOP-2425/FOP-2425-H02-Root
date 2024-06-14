@@ -34,7 +34,54 @@ public class FourWins {
             final int column = inputHandler.getNextInput();
             // TODO: place robot
 
+    /**
+     * Calculates the next unoccupied row index in the specified column. This row index is the next destination for a
+     * falling coin.
+     *
+     * @param column The column index where the coin is to be dropped.
+     * @param coins  2D array representing the game board, where each cell contains a RobotFamily
+     *               object indicating the player that has placed a coin in that position.
+     * @return Index of the next unoccupied row index in the specified column.
+     */
+    @StudentImplementationRequired("H2.2.2")
+    int getDestinationRow(final int column, final RobotFamily[][] coins) {
+        for (int row = 0; row < coins.length; row++) {
+            if (coins[row][column] == null) return row;
         }
+        return coins.length - 1;
+    }
+
+    /**
+     * Drops a coin into the specified column of the game board, simulating a falling animation.
+     * This method gets the destination row for the coin in the specified column with the `getDestinationRow` method.
+     * It creates a new Robot instance to represent the coin with the currentPlayer's RobotFamily in the given column
+     * and the destination row. After that it simulates the coin's fall by decrementing its position until it reaches
+     * the destination row. Once the  coin reaches its destination, the method updates the coins array (a 2D array of
+     * RobotFamily colors) to mark the slot as occupied by the currentPlayer.
+     *
+     * @param column        The column index where the coin is to be dropped.
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
+     *                      object indicating the player that has placed a coin in that position.
+     * @param currentPlayer The RobotFamily object representing the current player dropping the coin.
+     */
+    @StudentImplementationRequired("H2.2.2")
+    void dropCoin(final int column, final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+        int row = getDestinationRow(column, coins);
+
+        // spawn coin
+        Robot coin = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
+
+        // let coin fall
+        for (int currentRow = World.getHeight() - 1; currentRow > row; currentRow--) {
+            coin.move();
+        }
+
+        // turn coin up
+        coin.turnLeft();
+        coin.turnLeft();
+
+        // set slot as occupied
+        coins[row][column] = currentPlayer;
     }
 
     /**
