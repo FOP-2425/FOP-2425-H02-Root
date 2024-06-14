@@ -24,7 +24,10 @@ public class OneDimensionalArrayStuff {
     @StudentImplementationRequired("H2.1.1")
     public static int[] push(final int[] array, final int value) {
         final int[] newArray = new int[array.length + 1];
-        System.arraycopy(array, 0, newArray, 0, array.length);
+        //noinspection ManualArrayCopy
+        for (int i = 0; i < array.length; i++) {
+            newArray[i] = array[i];
+        }
         newArray[array.length] = value;
         return newArray;
     }
