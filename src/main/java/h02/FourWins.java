@@ -158,12 +158,7 @@ public class FourWins {
         if (column < 0 || column >= World.getWidth()) {
             return false;
         }
-        for (int y = 0; y < World.getHeight(); y++) {
-            if (!isOccupied(column, y)) {
-                return true;
-            }
-        }
-        return false;
+        return !isOccupied(column, World.getHeight() - 1);
     }
 
     /**
