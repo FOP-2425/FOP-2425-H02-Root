@@ -8,13 +8,15 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
 public class FourWins {
     private final InputHandler inputHandler = new InputHandler(this);
+
+    private boolean finished = false;
 
     void startGame() {
         setupWorld();
@@ -73,16 +75,24 @@ public class FourWins {
         final RobotFamily[][] coins = new RobotFamily[World.getHeight()][World.getWidth()];
         RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
 
-        boolean finished = false;
+        finished = false;
         while (!finished) {
-            final int column = inputHandler.getNextInput();
-
             currentPlayer = switchPlayer(currentPlayer);
+            final int column = inputHandler.getNextInput(currentPlayer);
+
             dropCoin(column, coins, currentPlayer);
             finished = testWinConditions(coins, currentPlayer);
         }
 
         displayWinner(currentPlayer);
+    }
+
+    /**
+     * Returns {@code true} when the game is finished, {@code false} otherwise.
+     * @return whether the game is finished.
+     */
+    public boolean isFinished() {
+        return finished;
     }
 
     /**
