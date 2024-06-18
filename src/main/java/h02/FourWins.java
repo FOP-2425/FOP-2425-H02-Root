@@ -185,14 +185,13 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.3")
     boolean testWinHorizontal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
         for (int row = 0; row < World.getHeight(); row++) {
+            int coinCount = 0;
             for (int column = 0; column < World.getWidth(); column++) {
                 if (coins[row][column] == currentPlayer) coinCount++;
                 else coinCount = 0;
                 if (coinCount >= 4) return true;
             }
-
         }
         return false;
     }
@@ -207,14 +206,13 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.3")
     boolean testWinVertical(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
         for (int column = 0; column < World.getWidth(); column++) {
+            int coinCount = 0;
             for (int row = 0; row < World.getHeight(); row++) {
                 if (coins[row][column] == currentPlayer) coinCount++;
                 else coinCount = 0;
                 if (coinCount >= 4) return true;
             }
-            coinCount = 0;
         }
         return false;
     }
@@ -229,7 +227,6 @@ public class FourWins {
      */
     @DoNotTouch
     boolean testWinDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
         final int MAX_COINS = 4;
 
         final int WIDTH = World.getWidth();
@@ -237,8 +234,9 @@ public class FourWins {
 
         final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
 
-        // upper left triangle
+        // check upper left triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = j;
                 final int y = HEIGHT - SMALL_SIDE + i + j;
@@ -247,12 +245,12 @@ public class FourWins {
                 else coinCount = 0;
                 if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
-        // center
+        // check center diagonals
         if (WIDTH == SMALL_SIDE) {
             for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = j;
                     final int y = i + j;
@@ -261,10 +259,10 @@ public class FourWins {
                     else coinCount = 0;
                     if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         } else {
             for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = i + j;
                     final int y = j;
@@ -273,12 +271,12 @@ public class FourWins {
                     else coinCount = 0;
                     if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         }
 
-        // lower right triangle
+        // check lower right triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = WIDTH - 1 - j;
                 final int y = SMALL_SIDE - 1 - (i + j);
@@ -287,7 +285,6 @@ public class FourWins {
                 else coinCount = 0;
                 if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
         return false;
@@ -303,7 +300,6 @@ public class FourWins {
      */
     @DoNotTouch
     boolean testWinAntiDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
         final int MAX_COINS = 4;
 
         final int WIDTH = World.getWidth();
@@ -311,8 +307,9 @@ public class FourWins {
 
         final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
 
-        // lower left triangle
+        // check lower left triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = SMALL_SIDE - 1 - (i + j);
                 final int y = j;
@@ -321,12 +318,12 @@ public class FourWins {
                 else coinCount = 0;
                 if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
-        // center
+        // check center anti diagonals
         if (WIDTH == SMALL_SIDE) {
             for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = WIDTH - 1 - j;
                     final int y = i + j;
@@ -335,24 +332,23 @@ public class FourWins {
                     else coinCount = 0;
                     if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         } else {
             for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = WIDTH - 1 - i - j;
                     final int y = j;
 
                     if (coins[y][x] == currentPlayer) coinCount++;
-                    else coinCount = 0;
                     if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         }
 
-        // upper right triangle
+        // check upper right triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = WIDTH - SMALL_SIDE + i + j;
                 final int y = HEIGHT - 1 - j;
@@ -361,7 +357,6 @@ public class FourWins {
                 else coinCount = 0;
                 if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
         return false;
