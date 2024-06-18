@@ -8,7 +8,7 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
@@ -172,7 +172,7 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.3")
     boolean testWinConditions(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        return testWinVertical(coins, currentPlayer) || testWinHorizontal(coins, currentPlayer) || testWinDiagonal(coins, currentPlayer) || testWinAntiDiagonal(coins, currentPlayer);
+        return testWinVertical(coins, currentPlayer) || testWinHorizontal(coins, currentPlayer) || testWinDiagonal(coins, currentPlayer)/* || testWinAntiDiagonal(coins, currentPlayer)*/;
     }
 
     /**
@@ -219,6 +219,14 @@ public class FourWins {
         return false;
     }
 
+    private boolean isValidCoordinate(final int x, final int y) {
+        return x >= 0 && x < World.getWidth() && y >= 0 && y < World.getHeight();
+    }
+
+    private int[] rotate90(final int x, final int y) {
+        return new int[]{y, -x};
+    }
+
     /**
      * Checks if the current player has won by forming a diagonal (bottom left to top right) line of at least four coins.
      *
@@ -235,59 +243,23 @@ public class FourWins {
         final int WIDTH = World.getWidth();
         final int HEIGHT = World.getHeight();
 
-        final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
+        int[] vec = {1, 1};
 
-        // upper left triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = j;
-                final int y = HEIGHT - SMALL_SIDE + i + j;
-
-                if (coins[y][x] == currentPlayer) coinCount++;
-                else coinCount = 0;
-                if (coinCount >= MAX_COINS) return true;
-            }
-            coinCount = 0;
-        }
-
-        // center
-        if (WIDTH == SMALL_SIDE) {
-            for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = j;
-                    final int y = i + j;
-
-                    if (coins[y][x] == currentPlayer) coinCount++;
-                    else coinCount = 0;
-                    if (coinCount >= MAX_COINS) return true;
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                final int[] pos = {i, j};
+                for (int k = 0; k < 4; k++) {
+                    // check
+                    while(isValidCoordinate(pos[0], pos[1]) && coins[pos[0]][pos[1]] == currentPlayer) {
+                        coinCount++;
+                        if (coinCount >= MAX_COINS) return true;
+                        pos[0] += vec[0];
+                        pos[1] += vec[1];
+                    }
+                    vec = rotate90(vec[0], vec[1]);
+                    coinCount = 0;
                 }
-                coinCount = 0;
             }
-        } else {
-            for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = i + j;
-                    final int y = j;
-
-                    if (coins[y][x] == currentPlayer) coinCount++;
-                    else coinCount = 0;
-                    if (coinCount >= MAX_COINS) return true;
-                }
-                coinCount = 0;
-            }
-        }
-
-        // lower right triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = WIDTH - 1 - j;
-                final int y = SMALL_SIDE - 1 - (i + j);
-
-                if (coins[y][x] == currentPlayer) coinCount++;
-                else coinCount = 0;
-                if (coinCount >= MAX_COINS) return true;
-            }
-            coinCount = 0;
         }
 
         return false;
