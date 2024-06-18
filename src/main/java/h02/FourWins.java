@@ -10,6 +10,9 @@ import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
 import java.awt.Color;
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
@@ -79,8 +82,8 @@ public class FourWins {
             final int column = inputHandler.getNextInput();
 
             currentPlayer = switchPlayer(currentPlayer);
-            dropCoin(column, coins, currentPlayer);
-            finished = testWinConditions(coins, currentPlayer);
+            final var pos = dropCoin(column, coins, currentPlayer);
+            finished = testWinConditions(coins, currentPlayer, pos);
         }
 
         displayWinner(currentPlayer);
@@ -117,7 +120,7 @@ public class FourWins {
      * @param currentPlayer The RobotFamily object representing the current player dropping the coin.
      */
     @StudentImplementationRequired("H2.2.2")
-    void dropCoin(final int column, final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+    Point dropCoin(final int column, final RobotFamily[][] coins, final RobotFamily currentPlayer) {
         int row = getDestinationRow(column, coins);
 
         // spawn coin
@@ -134,6 +137,7 @@ public class FourWins {
 
         // set slot as occupied
         coins[row][column] = currentPlayer;
+        return new Point(column, row);
     }
 
     /**
@@ -172,52 +176,8 @@ public class FourWins {
      * @return true if the current player has formed a horizontal line of at least four coins; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinConditions(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        return testWinVertical(coins, currentPlayer) || testWinHorizontal(coins, currentPlayer) || testWinDiagonal(coins, currentPlayer);
-    }
-
-    /**
-     * Checks if the current player has won by forming a horizontal line of at least four coins.
-     *
-     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
-     *                      color indicating the player that has placed a coin in that position.
-     * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a horizontal line of at least four coins; false otherwise.
-     */
-    @StudentImplementationRequired("H2.2.3")
-    boolean testWinHorizontal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
-        for (int row = 0; row < World.getHeight(); row++) {
-            for (int column = 0; column < World.getWidth(); column++) {
-                if (coins[row][column] == currentPlayer) coinCount++;
-                else coinCount = 0;
-                if (coinCount >= 4) return true;
-            }
-
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the current player has won by forming a vertical line of at least four coins.
-     *
-     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
-     *                      color indicating the player that has placed a coin in that position.
-     * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a vertical line of at least four coins; false otherwise.
-     */
-    @StudentImplementationRequired("H2.2.3")
-    boolean testWinVertical(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
-        for (int column = 0; column < World.getWidth(); column++) {
-            for (int row = 0; row < World.getHeight(); row++) {
-                if (coins[row][column] == currentPlayer) coinCount++;
-                else coinCount = 0;
-                if (coinCount >= 4) return true;
-            }
-            coinCount = 0;
-        }
-        return false;
+    boolean testWinConditions(final RobotFamily[][] coins, final RobotFamily currentPlayer, final Point placement) {
+        return testWinEfficient(coins, currentPlayer, placement);
     }
 
     /**
@@ -233,52 +193,29 @@ public class FourWins {
     }
 
     /**
-     * Rotates the given vector by 90 degrees clockwise.
-     *
-     * @param x The x-coordinate of the vector.
-     * @param y The y-coordinate of the vector.
-     * @return The rotated vector.
-     */
-    @DoNotTouch
-    private int[] rotate90(final int x, final int y) {
-        return new int[]{y, -x};
-    }
-
-    /**
-     * Checks if the current player has won by forming a diagonal (bottom left to top right) line of at least four coins.
+     * Checks if the current player has won by any condition. The conditions can be a horizontal, vertical, diagonal,
+     * or anti-diagonal line of at least four coins.
      *
      * @param coins         2D array representing the game board, where each cell contains a RobotFamily
-     *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a diagonal line of at least four coins; false otherwise.
+     * @param placement     The coordinates of the last placed coin.
+     * @return true if the current player has formed a horizontal line of at least four coins; false otherwise.
      */
-    @DoNotTouch
-    boolean testWinDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
-        final int MAX_COINS = 4;
-
-        final int WIDTH = World.getWidth();
-        final int HEIGHT = World.getHeight();
-
-        int[] vec = {1, 1};
-
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
-                final int[] pos = {i, j};
-                for (int k = 0; k < 4; k++) {
-                    // check
-                    while (isValidCoordinate(pos[0], pos[1]) && coins[pos[0]][pos[1]] == currentPlayer) {
-                        coinCount++;
-                        if (coinCount >= MAX_COINS) return true;
-                        pos[0] += vec[0];
-                        pos[1] += vec[1];
-                    }
-                    vec = rotate90(vec[0], vec[1]);
-                    coinCount = 0;
+    public boolean testWinEfficient(final RobotFamily[][] coins, final RobotFamily currentPlayer, final Point placement) {
+        final Map<Point, Integer> coinCounts = new HashMap<>();
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                if (x == 0 && y == 0) continue;
+                final Point pos = new Point(placement.x, placement.y);
+                int coinCount = -1;
+                while (isValidCoordinate(pos.x, pos.y) && coins[pos.y][pos.x] == currentPlayer) {
+                    coinCount++;
+                    if (coinCount + coinCounts.getOrDefault(new Point(-x, -y), 0) + 1 >= 4) return true;
+                    pos.translate(x, y);
                 }
+                coinCounts.put(new Point(x, y), coinCount);
             }
         }
-
         return false;
     }
 }
