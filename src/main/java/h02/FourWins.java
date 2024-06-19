@@ -254,7 +254,6 @@ public class FourWins {
      */
     @DoNotTouch
     boolean testWinDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
-        int coinCount = 0;
         final int MAX_COINS = 4;
 
         final int WIDTH = World.getWidth();
@@ -265,8 +264,8 @@ public class FourWins {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
                 final int[] pos = {i, j};
-                for (int k = 0; k < 4; k++) {
-                    // check
+                for (int direction = 0; direction < 4; direction++) {
+                    int coinCount = 0;
                     while (isValidCoordinate(pos[0], pos[1]) && coins[pos[0]][pos[1]] == currentPlayer) {
                         coinCount++;
                         if (coinCount >= MAX_COINS) return true;
@@ -274,7 +273,6 @@ public class FourWins {
                         pos[1] += vec[1];
                     }
                     vec = rotate90(vec[0], vec[1]);
-                    coinCount = 0;
                 }
             }
         }
