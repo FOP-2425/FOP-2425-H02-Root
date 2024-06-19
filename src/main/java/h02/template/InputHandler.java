@@ -96,7 +96,7 @@ public class InputHandler {
     }
 
     /**
-     * Adds an input to the input queue. When {@link #getNextInput(RobotFamily)} is called, the program will wait until this method is called.
+     * Adds an input to the input queue. When {@link #getNextInput(RobotFamily, RobotFamily[][])} is called, the program will wait until this method is called.
      *
      * @param input the input to add
      */
@@ -110,15 +110,15 @@ public class InputHandler {
      *
      * @return the next input from the input queue
      */
-    public int getNextInput(final RobotFamily currentPlayer) {
+    public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
         rowSelectMode.set(true);
         statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.name() + "</html>");
         try {
             final int input = inputQueue.take();
             System.out.println("Received input: " + input);
-            if (!fourWins.validateInput(input)) {
+            if (!fourWins.validateInput(input, stones)) {
                 System.out.println("Invalid input, please try again.");
-                return getNextInput(currentPlayer);
+                return getNextInput(currentPlayer, stones);
             }
             rowSelectMode.set(false);
             return input;
