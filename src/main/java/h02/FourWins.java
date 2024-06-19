@@ -69,7 +69,7 @@ public class FourWins {
      * @param y the y coordinate of the field
      * @param color the {@link RobotFamily} corresponding to the field color to set
      */
-    @SolutionOnly
+    @DoNotTouch
     void setFieldColor(final int x, final int y, final RobotFamily color) {
         if (color != RobotFamily.SQUARE_BLUE && color != RobotFamily.SQUARE_RED)
             throw new IllegalArgumentException("RobotFamily color must be either RobotFamily.SQUARE_BLUE or RobotFamily.SQUARE_RED!");
