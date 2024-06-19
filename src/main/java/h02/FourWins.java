@@ -6,6 +6,7 @@ import fopbot.RobotFamily;
 import fopbot.World;
 import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
+import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
 import java.awt.Color;
@@ -56,9 +57,21 @@ public class FourWins {
 
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
-                World.getGlobalWorld().setFieldColor(x, y, winner == RobotFamily.SQUARE_BLUE ? Color.BLUE : Color.RED);
+                setFieldColor(x, y, winner);
             }
         }
+    }
+
+    /**
+     * Sets the background color of a field at the specified coordinates. The color is derived from the
+     * {@link RobotFamily} SQUARE_BLUE or SQUARE_RED.
+     * @param x the x coordinate of the field
+     * @param y the y coordinate of the field
+     * @param color the {@link RobotFamily} corresponding to the field color to set
+     */
+    @DoNotTouch
+    void setFieldColor(final int x, final int y, final RobotFamily color) {
+        World.getGlobalWorld().setFieldColor(x, y, color.getColor());
     }
 
     /**
