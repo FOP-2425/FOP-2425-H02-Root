@@ -72,16 +72,16 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.4")
     void gameLoop() {
-        final RobotFamily[][] coins = new RobotFamily[World.getHeight()][World.getWidth()];
+        final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
         RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
 
         finished = false;
         while (!finished) {
             currentPlayer = switchPlayer(currentPlayer);
-            final int column = inputHandler.getNextInput(currentPlayer);
+            final int column = inputHandler.getNextInput(currentPlayer, stones);
 
-            dropCoin(column, coins, currentPlayer);
-            finished = testWinConditions(coins, currentPlayer);
+            dropCoin(column, stones, currentPlayer);
+            finished = testWinConditions(stones, currentPlayer);
         }
 
         displayWinner(currentPlayer);
@@ -91,6 +91,7 @@ public class FourWins {
      * Returns {@code true} when the game is finished, {@code false} otherwise.
      * @return whether the game is finished.
      */
+    @DoNotTouch
     public boolean isFinished() {
         return finished;
     }
@@ -146,29 +147,15 @@ public class FourWins {
     }
 
     /**
-     * Checks if the given field is occupied by a robot. The input coordinates are expected to be valid.
-     *
-     * @param x the x-coordinate of the field
-     * @param y the y-coordinate of the field
-     * @return true if the field is occupied by a robot, false otherwise
-     */
-    @DoNotTouch
-    public static boolean isOccupied(final int x, final int y) {
-        return World.getGlobalWorld().getField(x, y).getEntities().stream().anyMatch(Robot.class::isInstance);
-    }
-
-    /**
      * Validates if a given column index is within the bounds of the game board and not fully occupied.
      *
      * @param column The column index to validate.
      * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
     @StudentImplementationRequired("H2.2.1")
-    public boolean validateInput(final int column) {
-        if (column < 0 || column >= World.getWidth()) {
-            return false;
-        }
-        return !isOccupied(column, World.getHeight() - 1);
+    public boolean validateInput(final int column, final RobotFamily[][] stones) {
+        if (column < 0 || column >= World.getWidth()) return false;
+        return stones[column][World.getHeight() - 1] == null;
     }
 
     /**
