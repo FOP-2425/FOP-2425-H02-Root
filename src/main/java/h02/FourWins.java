@@ -64,7 +64,7 @@ public class FourWins {
     /**
      * Executes the main game loop, handling player turns, coin drops, and win condition checks.
      * This method initializes the game board as a 2D array of RobotFamily colors, representing
-     * the slots that can be filled with players' stones. It starts with a predefined currentPlayer
+     * the slots that can be filled with players' coins. It starts with a predefined currentPlayer
      * and continues in a loop until a win condition is met. Each iteration of the loop waits for
      * player input to select a column to drop a coin into, switches the current player, drops the
      * coin in the selected column, and checks for win conditions. If a win condition is met, the
@@ -72,17 +72,16 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.4")
     void gameLoop() {
-        final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
+        final RobotFamily[][] coins = new RobotFamily[World.getHeight()][World.getWidth()];
         RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
 
         finished = false;
         while (!finished) {
             currentPlayer = switchPlayer(currentPlayer);
-            final int column = inputHandler.getNextInput(currentPlayer, stones);
+            final int column = inputHandler.getNextInput(currentPlayer);
 
-            // Student implementation starts here:
-            dropCoin(column, stones, currentPlayer);
-            finished = testWinConditions(stones, currentPlayer);
+            dropCoin(column, coins, currentPlayer);
+            finished = testWinConditions(coins, currentPlayer);
         }
 
         displayWinner(currentPlayer);
@@ -92,7 +91,6 @@ public class FourWins {
      * Returns {@code true} when the game is finished, {@code false} otherwise.
      * @return whether the game is finished.
      */
-    @DoNotTouch
     public boolean isFinished() {
         return finished;
     }
@@ -102,16 +100,16 @@ public class FourWins {
      * falling coin.
      *
      * @param column The column index where the coin is to be dropped.
-     * @param stones  2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins  2D array representing the game board, where each cell contains a RobotFamily
      *               object indicating the player that has placed a coin in that position.
      * @return Index of the next unoccupied row index in the specified column.
      */
     @StudentImplementationRequired("H2.2.2")
-    int getDestinationRow(final int column, final RobotFamily[][] stones) {
-        for (int row = 0; row < stones.length; row++) {
-            if (stones[row][column] == null) return row;
+    int getDestinationRow(final int column, final RobotFamily[][] coins) {
+        for (int row = 0; row < coins.length; row++) {
+            if (coins[row][column] == null) return row;
         }
-        return stones.length - 1;
+        return coins.length - 1;
     }
 
     /**
@@ -119,17 +117,17 @@ public class FourWins {
      * This method gets the destination row for the coin in the specified column with the `getDestinationRow` method.
      * It creates a new Robot instance to represent the coin with the currentPlayer's RobotFamily in the given column
      * and the destination row. After that it simulates the coin's fall by decrementing its position until it reaches
-     * the destination row. Once the  coin reaches its destination, the method updates the stones array (a 2D array of
+     * the destination row. Once the  coin reaches its destination, the method updates the coins array (a 2D array of
      * RobotFamily colors) to mark the slot as occupied by the currentPlayer.
      *
      * @param column        The column index where the coin is to be dropped.
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      object indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily object representing the current player dropping the coin.
      */
     @StudentImplementationRequired("H2.2.2")
-    void dropCoin(final int column, final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int row = getDestinationRow(column, stones);
+    void dropCoin(final int column, final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+        int row = getDestinationRow(column, coins);
 
         // spawn coin
         Robot coin = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
@@ -144,7 +142,19 @@ public class FourWins {
         coin.turnLeft();
 
         // set slot as occupied
-        stones[row][column] = currentPlayer;
+        coins[row][column] = currentPlayer;
+    }
+
+    /**
+     * Checks if the given field is occupied by a robot. The input coordinates are expected to be valid.
+     *
+     * @param x the x-coordinate of the field
+     * @param y the y-coordinate of the field
+     * @return true if the field is occupied by a robot, false otherwise
+     */
+    @DoNotTouch
+    public static boolean isOccupied(final int x, final int y) {
+        return World.getGlobalWorld().getField(x, y).getEntities().stream().anyMatch(Robot.class::isInstance);
     }
 
     /**
@@ -154,212 +164,209 @@ public class FourWins {
      * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
     @StudentImplementationRequired("H2.2.1")
-    public boolean validateInput(final int column, final RobotFamily[][] stones) {
-        if (column < 0 || column >= World.getWidth()) return false;
-        return stones[column][World.getHeight() - 1] == null;
+    public boolean validateInput(final int column) {
+        if (column < 0 || column >= World.getWidth()) {
+            return false;
+        }
+        return !isOccupied(column, World.getHeight() - 1);
     }
 
     /**
      * Checks if the current player has won by any condition. The conditions can be a horizontal, vertical, diagonal,
-     * or anti-diagonal line of at least four stones.
+     * or anti-diagonal line of at least four coins.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
+     * @return true if the current player has formed a horizontal line of at least four coins; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinConditions(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        return testWinVertical(stones, currentPlayer) || testWinHorizontal(stones, currentPlayer) || testWinDiagonal(stones, currentPlayer) || testWinAntiDiagonal(stones, currentPlayer);
+    boolean testWinConditions(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+        return testWinVertical(coins, currentPlayer) || testWinHorizontal(coins, currentPlayer) || testWinDiagonal(coins, currentPlayer) || testWinAntiDiagonal(coins, currentPlayer);
     }
 
     /**
-     * Checks if the current player has won by forming a horizontal line of at least four stones.
+     * Checks if the current player has won by forming a horizontal line of at least four coins.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
+     * @return true if the current player has formed a horizontal line of at least four coins; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinHorizontal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int coinCount = 0;
+    boolean testWinHorizontal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
         for (int row = 0; row < World.getHeight(); row++) {
+            int coinCount = 0;
             for (int column = 0; column < World.getWidth(); column++) {
-                if (stones[row][column] == currentPlayer) coinCount++;
+                if (coins[row][column] == currentPlayer) coinCount++;
                 else coinCount = 0;
                 if (coinCount >= 4) return true;
             }
-
         }
         return false;
     }
 
     /**
-     * Checks if the current player has won by forming a vertical line of at least four stones.
+     * Checks if the current player has won by forming a vertical line of at least four coins.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a vertical line of at least four stones; false otherwise.
+     * @return true if the current player has formed a vertical line of at least four coins; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinVertical(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int coinCount = 0;
+    boolean testWinVertical(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
         for (int column = 0; column < World.getWidth(); column++) {
+            int coinCount = 0;
             for (int row = 0; row < World.getHeight(); row++) {
-                if (stones[row][column] == currentPlayer) coinCount++;
+                if (coins[row][column] == currentPlayer) coinCount++;
                 else coinCount = 0;
                 if (coinCount >= 4) return true;
             }
-            coinCount = 0;
         }
         return false;
     }
 
     /**
-     * Checks if the current player has won by forming a diagonal (bottom left to top right) line of at least four stones.
+     * Checks if the current player has won by forming a diagonal (bottom left to top right) line of at least four coins.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a diagonal line of at least four stones; false otherwise.
+     * @return true if the current player has formed a diagonal line of at least four coins; false otherwise.
      */
     @DoNotTouch
-    boolean testWinDiagonal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int coinCount = 0;
-        final int MAX_STONES = 4;
+    boolean testWinDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+        final int MAX_COINS = 4;
 
         final int WIDTH = World.getWidth();
         final int HEIGHT = World.getHeight();
 
         final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
 
-        // upper left triangle
+        // check upper left triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = j;
                 final int y = HEIGHT - SMALL_SIDE + i + j;
 
-                if (stones[y][x] == currentPlayer) coinCount++;
+                if (coins[y][x] == currentPlayer) coinCount++;
                 else coinCount = 0;
-                if (coinCount >= MAX_STONES) return true;
+                if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
-        // center
+        // check center diagonals
         if (WIDTH == SMALL_SIDE) {
             for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = j;
                     final int y = i + j;
 
-                    if (stones[y][x] == currentPlayer) coinCount++;
+                    if (coins[y][x] == currentPlayer) coinCount++;
                     else coinCount = 0;
-                    if (coinCount >= MAX_STONES) return true;
+                    if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         } else {
             for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = i + j;
                     final int y = j;
 
-                    if (stones[y][x] == currentPlayer) coinCount++;
+                    if (coins[y][x] == currentPlayer) coinCount++;
                     else coinCount = 0;
-                    if (coinCount >= MAX_STONES) return true;
+                    if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         }
 
-        // lower right triangle
+        // check lower right triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = WIDTH - 1 - j;
                 final int y = SMALL_SIDE - 1 - (i + j);
 
-                if (stones[y][x] == currentPlayer) coinCount++;
+                if (coins[y][x] == currentPlayer) coinCount++;
                 else coinCount = 0;
-                if (coinCount >= MAX_STONES) return true;
+                if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
         return false;
     }
 
     /**
-     * Checks if the current player has won by forming a diagonal (top left to bottom right) line of at least four stones.
+     * Checks if the current player has won by forming a diagonal (top left to bottom right) line of at least four coins.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param coins         2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a coin in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a diagonal line of at least four stones; false otherwise.
+     * @return true if the current player has formed a diagonal line of at least four coins; false otherwise.
      */
     @DoNotTouch
-    boolean testWinAntiDiagonal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int coinCount = 0;
-        final int MAX_STONES = 4;
+    boolean testWinAntiDiagonal(final RobotFamily[][] coins, final RobotFamily currentPlayer) {
+        final int MAX_COINS = 4;
 
         final int WIDTH = World.getWidth();
         final int HEIGHT = World.getHeight();
 
         final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
 
-        // lower left triangle
+        // check lower left triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = SMALL_SIDE - 1 - (i + j);
                 final int y = j;
 
-                if (stones[y][x] == currentPlayer) coinCount++;
+                if (coins[y][x] == currentPlayer) coinCount++;
                 else coinCount = 0;
-                if (coinCount >= MAX_STONES) return true;
+                if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
-        // center
+        // check center anti diagonals
         if (WIDTH == SMALL_SIDE) {
             for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = WIDTH - 1 - j;
                     final int y = i + j;
 
-                    if (stones[y][x] == currentPlayer) coinCount++;
+                    if (coins[y][x] == currentPlayer) coinCount++;
                     else coinCount = 0;
-                    if (coinCount >= MAX_STONES) return true;
+                    if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         } else {
             for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
+                int coinCount = 0;
                 for (int j = 0; j < SMALL_SIDE; j++) {
                     final int x = WIDTH - 1 - i - j;
                     final int y = j;
 
-                    if (stones[y][x] == currentPlayer) coinCount++;
-                    else coinCount = 0;
-                    if (coinCount >= MAX_STONES) return true;
+                    if (coins[y][x] == currentPlayer) coinCount++;
+                    if (coinCount >= MAX_COINS) return true;
                 }
-                coinCount = 0;
             }
         }
 
-        // upper right triangle
+        // check upper right triangle
         for (int i = 0; i < SMALL_SIDE; i++) {
+            int coinCount = 0;
             for (int j = 0; j < SMALL_SIDE - i; j++) {
                 final int x = WIDTH - SMALL_SIDE + i + j;
                 final int y = HEIGHT - 1 - j;
 
-                if (stones[y][x] == currentPlayer) coinCount++;
+                if (coins[y][x] == currentPlayer) coinCount++;
                 else coinCount = 0;
-                if (coinCount >= MAX_STONES) return true;
+                if (coinCount >= MAX_COINS) return true;
             }
-            coinCount = 0;
         }
 
         return false;
