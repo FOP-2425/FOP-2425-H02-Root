@@ -180,7 +180,7 @@ public class FourWins {
     @StudentImplementationRequired("H2.2.1")
     public boolean validateInput(final int column, RobotFamily[][] stones) {
         if (column < 0 || column >= World.getWidth()) return false;
-        return stones[column][World.getHeight() - 1] == null;
+        return stones[World.getHeight() - 1][column] == null;
     }
 
     /**
