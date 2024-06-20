@@ -160,18 +160,6 @@ public class FourWins {
     }
 
     /**
-     * Checks if the given field is occupied by a robot. The input coordinates are expected to be valid.
-     *
-     * @param x the x-coordinate of the field
-     * @param y the y-coordinate of the field
-     * @return true if the field is occupied by a robot, false otherwise
-     */
-    @DoNotTouch
-    public static boolean isOccupied(final int x, final int y) {
-        return World.getGlobalWorld().getField(x, y).getEntities().stream().anyMatch(Robot.class::isInstance);
-    }
-
-    /**
      * Validates if a given column index is within the bounds of the game board and not fully occupied.
      *
      * @param column The column index to validate.
