@@ -1,5 +1,7 @@
 package h02;
 
+import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
+
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.testEquals;
 
@@ -24,6 +26,7 @@ public class Main {
     /**
      * Perform sanity checks for exercise H2.1.1.
      */
+    @StudentImplementationRequired("H2.3")
     public static void sanityChecksH211() {
         // push test
         final int[] newArray = OneDimensionalArrayStuff.push(new int[]{0, 1}, 2);
@@ -55,6 +58,7 @@ public class Main {
     /**
      * Perform sanity checks for exercise H2.1.2.
      */
+    @StudentImplementationRequired("H2.3")
     public static void sanityChecksH212() {
         // simple test
         sanityChecksH212Helper(

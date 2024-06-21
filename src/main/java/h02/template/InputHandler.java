@@ -64,19 +64,19 @@ public class InputHandler {
     /**
      * Installs the input handler to the fopbot world.
      */
+    @SuppressWarnings("UnstableApiUsage")
     public void install() {
+        final var guiPanel = World.getGlobalWorld().getGuiPanel();
         World.getGlobalWorld().getInputHandler().addFieldClickListener(e -> whenGameIsRunning(() -> addInput(e.getField().getX())));
         World.getGlobalWorld().getInputHandler().addFieldHoverListener(e -> whenGameIsRunning(() -> {
             // deselect last hovered field, if any
             if (e.getPreviousField() != null) {
-                System.out.println("deselecting column " + e.getPreviousField().getX());
                 setColumnColor(e.getPreviousField().getX(), () -> null);
             }
             if (rowSelectMode.get()) {
                 // select current hovered field
                 if (e.getField() != null) {
-                    System.out.println("selecting column " + e.getField().getX());
-                    setColumnColor(e.getField().getX(), () -> World.getGlobalWorld().getGuiPanel().isDarkMode()
+                    setColumnColor(e.getField().getX(), () -> guiPanel.isDarkMode()
                                                               ? Color.yellow
                                                               : Color.orange
                     );
@@ -84,10 +84,10 @@ public class InputHandler {
             }
         }));
         statusLabel.setFont(statusLabel.getFont().deriveFont(20.0f));
-        World.getGlobalWorld().getGuiPanel().add(statusLabel, JLabel.CENTER);
-        World.getGlobalWorld().getGuiPanel().addDarkModeChangeListener(this::onDarkModeChange);
+        guiPanel.add(statusLabel, JLabel.CENTER);
+        guiPanel.addDarkModeChangeListener(this::onDarkModeChange);
         // trigger dark mode change to set the correct color
-        World.getGlobalWorld().getGuiPanel().setDarkMode(World.getGlobalWorld().getGuiPanel().isDarkMode());
+        guiPanel.setDarkMode(World.getGlobalWorld().getGuiPanel().isDarkMode());
     }
 
     public void onDarkModeChange(final PropertyChangeEvent e) {

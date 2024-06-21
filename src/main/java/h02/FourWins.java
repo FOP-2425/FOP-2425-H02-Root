@@ -14,13 +14,22 @@ import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 public class FourWins {
     private final InputHandler inputHandler = new InputHandler(this);
 
+    /**
+     * Indicates whether the game has finished.
+     */
     private boolean finished = false;
 
+    /**
+     * Starts the game by setting up the world and executing the game loop.
+     */
     void startGame() {
         setupWorld();
         gameLoop();
     }
 
+    /**
+     * Sets up the world and installs the {@link InputHandler}.
+     */
     void setupWorld() {
         World.setSize(7, 6);
         World.setDelay(10);
@@ -141,10 +150,10 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.2")
     void dropStone(final int column, final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        int row = getDestinationRow(column, stones);
+        final int row = getDestinationRow(column, stones);
 
         // spawn stone
-        Robot stone = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
+        final Robot stone = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
 
         // let stone fall
         for (int currentRow = World.getHeight() - 1; currentRow > row; currentRow--) {
@@ -166,7 +175,7 @@ public class FourWins {
      * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
     @StudentImplementationRequired("H2.2.1")
-    public boolean validateInput(final int column, RobotFamily[][] stones) {
+    public boolean validateInput(final int column, final RobotFamily[][] stones) {
         if (column < 0 || column >= World.getWidth()) return false;
         return stones[World.getHeight() - 1][column] == null;
     }
