@@ -6,10 +6,7 @@ import fopbot.RobotFamily;
 import fopbot.World;
 import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
-import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
-
-import java.awt.Color;
 
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
@@ -66,8 +63,9 @@ public class FourWins {
      * Executes the main game loop, handling player turns, stone drops, and win condition checks.
      * Sets the background color of a field at the specified coordinates. The color is derived from the
      * {@link RobotFamily} SQUARE_BLUE or SQUARE_RED.
-     * @param x the x coordinate of the field
-     * @param y the y coordinate of the field
+     *
+     * @param x     the x coordinate of the field
+     * @param y     the y coordinate of the field
      * @param color the {@link RobotFamily} corresponding to the field color to set
      */
     @DoNotTouch
@@ -103,6 +101,7 @@ public class FourWins {
 
     /**
      * Returns {@code true} when the game is finished, {@code false} otherwise.
+     *
      * @return whether the game is finished.
      */
     public boolean isFinished() {
@@ -114,7 +113,7 @@ public class FourWins {
      * falling stone.
      *
      * @param column The column index where the stone is to be dropped.
-     * @param stones  2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones 2D array representing the game board, where each cell contains a RobotFamily
      *               object indicating the player that has placed a stone in that position.
      * @return Index of the next unoccupied row index in the specified column.
      */
@@ -135,7 +134,7 @@ public class FourWins {
      * RobotFamily colors) to mark the slot as occupied by the currentPlayer.
      *
      * @param column        The column index where the stone is to be dropped.
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones        2D array representing the game board, where each cell contains a RobotFamily
      *                      object indicating the player that has placed a stone in that position.
      * @param currentPlayer The RobotFamily object representing the current player dropping the stone.
      */
@@ -175,20 +174,20 @@ public class FourWins {
      * Checks if the current player has won by any condition. The conditions can be a horizontal, vertical, diagonal,
      * or anti-diagonal line of at least four stones.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones        2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a stone in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
      * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
     boolean testWinConditions(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        return testWinVertical(stones, currentPlayer) || testWinHorizontal(stones, currentPlayer) || testWinDiagonal(stones, currentPlayer) || testWinAntiDiagonal(stones, currentPlayer);
+        return testWinVertical(stones, currentPlayer) || testWinHorizontal(stones, currentPlayer) || testWinDiagonal(stones, currentPlayer);
     }
 
     /**
-     * Checks if the current player has won by forming a horizontal line of at least four stones.
+     * Checks if the current player has won by forming a horizontal line of at least consecutive four stones.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones        2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a stone in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
      * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
@@ -207,9 +206,9 @@ public class FourWins {
     }
 
     /**
-     * Checks if the current player has won by forming a vertical line of at least four stones.
+     * Checks if the current player has won by forming a vertical line of at least consecutive four stones.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones        2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a stone in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
      * @return true if the current player has formed a vertical line of at least four stones; false otherwise.
@@ -228,9 +227,9 @@ public class FourWins {
     }
 
     /**
-     * Checks if the current player has won by forming a diagonal (bottom left to top right) line of at least four stones.
+     * Checks if the current player has won by forming a diagonal line of at least consecutive four stones.
      *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
+     * @param stones        2D array representing the game board, where each cell contains a RobotFamily
      *                      color indicating the player that has placed a stone in that position.
      * @param currentPlayer The RobotFamily color representing the current player to check for a win.
      * @return true if the current player has formed a diagonal line of at least four stones; false otherwise.
@@ -241,135 +240,33 @@ public class FourWins {
 
         final int WIDTH = World.getWidth();
         final int HEIGHT = World.getHeight();
+        int[] direction = new int[]{1, 1};
 
-        final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
+        // for every field
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
 
-        // check upper left triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            int stoneCount = 0;
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = j;
-                final int y = HEIGHT - SMALL_SIDE + i + j;
+                // for every direction
+                for (int nthDirection = 0; nthDirection < 4; nthDirection++) {
+                    final int[] pos = {x, y};
 
-                if (stones[y][x] == currentPlayer) stoneCount++;
-                else stoneCount = 0;
-                if (stoneCount >= MAX_STONES) return true;
-            }
-        }
+                    // test for consecutive coins
+                    int coinCount = 0; // start counting at 0
+                    while (
+                        pos[0] >= 0 && pos[0] < WIDTH && pos[1] >= 0 && pos[1] < HEIGHT
+                            && stones[pos[1]][pos[0]] == currentPlayer
+                    ) {
+                        coinCount++; // count every stone that has currentPlayer's color
+                        if (coinCount >= MAX_STONES) return true;
+                        pos[0] += direction[0];
+                        pos[1] += direction[1];
+                    }
 
-        // check center diagonals
-        if (WIDTH == SMALL_SIDE) {
-            for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
-                int stoneCount = 0;
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = j;
-                    final int y = i + j;
-
-                    if (stones[y][x] == currentPlayer) stoneCount++;
-                    else stoneCount = 0;
-                    if (stoneCount >= MAX_STONES) return true;
+                    direction = new int[]{direction[1], -direction[0]}; // next direction (rotate by 90 deg)
                 }
-            }
-        } else {
-            for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
-                int stoneCount = 0;
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = i + j;
-                    final int y = j;
-
-                    if (stones[y][x] == currentPlayer) stoneCount++;
-                    else stoneCount = 0;
-                    if (stoneCount >= MAX_STONES) return true;
-                }
-            }
-        }
-
-        // check lower right triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            int stoneCount = 0;
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = WIDTH - 1 - j;
-                final int y = SMALL_SIDE - 1 - (i + j);
-
-                if (stones[y][x] == currentPlayer) stoneCount++;
-                else stoneCount = 0;
-                if (stoneCount >= MAX_STONES) return true;
             }
         }
 
         return false;
     }
-
-    /**
-     * Checks if the current player has won by forming a diagonal (top left to bottom right) line of at least four stones.
-     *
-     * @param stones         2D array representing the game board, where each cell contains a RobotFamily
-     *                      color indicating the player that has placed a stone in that position.
-     * @param currentPlayer The RobotFamily color representing the current player to check for a win.
-     * @return true if the current player has formed a diagonal line of at least four stones; false otherwise.
-     */
-    @DoNotTouch
-    boolean testWinAntiDiagonal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        final int MAX_STONES = 4;
-
-        final int WIDTH = World.getWidth();
-        final int HEIGHT = World.getHeight();
-
-        final int SMALL_SIDE = Math.min(WIDTH, HEIGHT);
-
-        // check lower left triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            int stoneCount = 0;
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = SMALL_SIDE - 1 - (i + j);
-                final int y = j;
-
-                if (stones[y][x] == currentPlayer) stoneCount++;
-                else stoneCount = 0;
-                if (stoneCount >= MAX_STONES) return true;
-            }
-        }
-
-        // check center anti diagonals
-        if (WIDTH == SMALL_SIDE) {
-            for (int i = 1; i < HEIGHT - SMALL_SIDE; i++) {
-                int stoneCount = 0;
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = WIDTH - 1 - j;
-                    final int y = i + j;
-
-                    if (stones[y][x] == currentPlayer) stoneCount++;
-                    else stoneCount = 0;
-                    if (stoneCount >= MAX_STONES) return true;
-                }
-            }
-        } else {
-            for (int i = 1; i < WIDTH - SMALL_SIDE; i++) {
-                int stoneCount = 0;
-                for (int j = 0; j < SMALL_SIDE; j++) {
-                    final int x = WIDTH - 1 - i - j;
-                    final int y = j;
-
-                    if (stones[y][x] == currentPlayer) stoneCount++;
-                    if (stoneCount >= MAX_STONES) return true;
-                }
-            }
-        }
-
-        // check upper right triangle
-        for (int i = 0; i < SMALL_SIDE; i++) {
-            int stoneCount = 0;
-            for (int j = 0; j < SMALL_SIDE - i; j++) {
-                final int x = WIDTH - SMALL_SIDE + i + j;
-                final int y = HEIGHT - 1 - j;
-
-                if (stones[y][x] == currentPlayer) stoneCount++;
-                else stoneCount = 0;
-                if (stoneCount >= MAX_STONES) return true;
-            }
-        }
-
-        return false;
-    }
-
 }
