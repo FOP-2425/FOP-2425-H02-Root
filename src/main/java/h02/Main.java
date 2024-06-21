@@ -1,5 +1,6 @@
 package h02;
 
+import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
@@ -84,6 +85,7 @@ public class Main {
         );
     }
 
+    @SolutionOnly
     public static void sanityChecksH212Helper(final String[][] input, final String query, final int[] refOcc, final int refMean) {
         final int[] occ = TwoDimensionalArrayStuff.occurrences(input, query);
         testEquals(refOcc.length, occ.length);
