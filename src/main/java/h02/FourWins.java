@@ -98,10 +98,10 @@ public class FourWins {
 
         finished = false;
         while (!finished) {
-            final int column = inputHandler.getNextInput(currentPlayer, stones);
-
-            // student implementation starts here:
             currentPlayer = switchPlayer(currentPlayer);
+            final int column = inputHandler.getNextInput(currentPlayer, stones);
+            // student implementation starts here:
+
             dropStone(column, stones, currentPlayer);
             finished = testWinConditions(stones, currentPlayer);
         }
