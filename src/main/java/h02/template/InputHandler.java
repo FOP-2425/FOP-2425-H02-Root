@@ -112,7 +112,7 @@ public class InputHandler {
      */
     public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
         rowSelectMode.set(true);
-        statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.name() + "</html>");
+        statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
         try {
             final int input = inputQueue.take();
             System.out.println("Received input: " + input);
