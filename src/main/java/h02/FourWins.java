@@ -3,16 +3,29 @@ package h02;
 import fopbot.Direction;
 import fopbot.Robot;
 import fopbot.RobotFamily;
+import fopbot.SvgBasedRobotFamily;
 import fopbot.World;
 import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
+
+import java.awt.Color;
 
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
 public class FourWins {
     private final InputHandler inputHandler = new InputHandler(this);
+
+    /**
+     * A teal triangle robot.
+     */
+    RobotFamily CHESS_QUEEN_BLACK = new SvgBasedRobotFamily(
+        "CHESS_QUEEN",
+        "/robots/chess_queen_black_on.svg",
+        "/robots/chess_queen_black_off.svg",
+        Color.BLACK
+    );
 
     /**
      * Indicates whether the game has finished.
@@ -98,12 +111,12 @@ public class FourWins {
 
         finished = false;
         while (!finished) {
-            currentPlayer = switchPlayer(currentPlayer);
             final int column = inputHandler.getNextInput(currentPlayer, stones);
-            // student implementation starts here:
 
+            // student implementation starts here:
             dropStone(column, stones, currentPlayer);
             finished = testWinConditions(stones, currentPlayer);
+            currentPlayer = switchPlayer(currentPlayer);
         }
 
         displayWinner(currentPlayer);
