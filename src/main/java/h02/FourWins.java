@@ -154,12 +154,11 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.2")
     void dropStone(final int column, final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        final int row = getDestinationRow(column, stones);
-
         // spawn stone
         final Robot stone = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
 
         // let stone fall
+        final int row = getDestinationRow(column, stones);
         for (int currentRow = World.getHeight() - 1; currentRow > row; currentRow--) {
             stone.move();
         }
