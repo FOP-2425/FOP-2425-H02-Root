@@ -136,7 +136,7 @@ public class FourWins {
         for (int row = 0; row < stones.length; row++) {
             if (stones[row][column] == null) return row;
         }
-        return stones.length - 1;
+        return -1;
     }
 
     /**
