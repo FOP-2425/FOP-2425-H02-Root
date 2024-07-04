@@ -17,6 +17,7 @@ public class FourWins {
     /**
      * Indicates whether the game has finished.
      */
+    @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
     private boolean finished = false;
 
     /**
