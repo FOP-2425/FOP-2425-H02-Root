@@ -42,12 +42,12 @@ public class TwoDimensionalArrayStuff {
      * @return the mean of the input array
      */
     @StudentImplementationRequired("H2.1.2")
-    public static int mean(final int[] input) {
+    public static float mean(final int[] input) {
         int sum = 0;
         for (final int j : input) {
             sum += j;
         }
-        return sum / input.length;
+        return (float) sum / input.length;
     }
 
     /**
@@ -58,7 +58,7 @@ public class TwoDimensionalArrayStuff {
      * @return the mean number of occurrences of the query {@link String} in each line of the input array
      */
     @DoNotTouch
-    public static int meanOccurrencesPerLine(final String[][] input, final String query) {
+    public static float meanOccurrencesPerLine(final String[][] input, final String query) {
         return mean(occurrences(input, query));
     }
 }

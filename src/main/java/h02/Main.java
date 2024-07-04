@@ -86,7 +86,7 @@ public class Main {
     }
 
     @SolutionOnly
-    public static void sanityChecksH212Helper(final String[][] input, final String query, final int[] refOcc, final int refMean) {
+    public static void sanityChecksH212Helper(final String[][] input, final String query, final int[] refOcc, final float refMean) {
         final int[] occ = TwoDimensionalArrayStuff.occurrences(input, query);
         testEquals(refOcc.length, occ.length);
         for (int i = 0; i < occ.length; i++) {
