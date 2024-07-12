@@ -47,7 +47,7 @@ public class FourWins {
      * @return The player color of the next player.
      */
     @StudentImplementationRequired("H2.2.4")
-    RobotFamily switchPlayer(final RobotFamily currentPlayer) {
+    public static RobotFamily switchPlayer(final RobotFamily currentPlayer) {
         if (currentPlayer == RobotFamily.SQUARE_BLUE) return RobotFamily.SQUARE_RED;
         return RobotFamily.SQUARE_BLUE;
     }
@@ -59,7 +59,7 @@ public class FourWins {
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
-    void displayWinner(final RobotFamily winner) {
+    public static void displayWinner(final RobotFamily winner) {
         System.out.println("Player of color " + winner + " wins the game!");
 
         for (int x = 0; x < World.getWidth(); x++) {
@@ -79,7 +79,7 @@ public class FourWins {
      * @param color the {@link RobotFamily} corresponding to the field color to set
      */
     @DoNotTouch
-    void setFieldColor(final int x, final int y, final RobotFamily color) {
+    public static void setFieldColor(final int x, final int y, final RobotFamily color) {
         World.getGlobalWorld().setFieldColor(x, y, color.getColor());
     }
 
@@ -133,7 +133,7 @@ public class FourWins {
      * @return Index of the next unoccupied row index in the specified column.
      */
     @StudentImplementationRequired("H2.2.2")
-    int getDestinationRow(final int column, final RobotFamily[][] stones) {
+    public static int getDestinationRow(final int column, final RobotFamily[][] stones) {
         for (int row = 0; row < stones.length; row++) {
             if (stones[row][column] == null) return row;
         }
@@ -154,7 +154,7 @@ public class FourWins {
      * @param currentPlayer The RobotFamily object representing the current player dropping the stone.
      */
     @StudentImplementationRequired("H2.2.2")
-    void dropStone(final int column, final RobotFamily[][] stones, final RobotFamily currentPlayer) {
+    public static void dropStone(final int column, final RobotFamily[][] stones, final RobotFamily currentPlayer) {
         // spawn stone
         final Robot stone = new Robot(column, World.getHeight() - 1, Direction.DOWN, 0, currentPlayer);
 
@@ -179,7 +179,7 @@ public class FourWins {
      * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
     @StudentImplementationRequired("H2.2.1")
-    public boolean validateInput(final int column, final RobotFamily[][] stones) {
+    public static  boolean validateInput(final int column, final RobotFamily[][] stones) {
         if (column < 0 || column >= World.getWidth()) return false;
         return stones[World.getHeight() - 1][column] == null;
     }
@@ -194,7 +194,7 @@ public class FourWins {
      * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinConditions(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
+    public static boolean testWinConditions(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
         return testWinVertical(stones, currentPlayer) || testWinHorizontal(stones, currentPlayer) || testWinDiagonal(stones, currentPlayer);
     }
 
@@ -207,7 +207,7 @@ public class FourWins {
      * @return true if the current player has formed a horizontal line of at least four stones; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinHorizontal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
+    public static boolean testWinHorizontal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
         for (int row = 0; row < World.getHeight(); row++) {
             int stoneCount = 0;
             for (int column = 0; column < World.getWidth(); column++) {
@@ -228,7 +228,7 @@ public class FourWins {
      * @return true if the current player has formed a vertical line of at least four stones; false otherwise.
      */
     @StudentImplementationRequired("H2.2.3")
-    boolean testWinVertical(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
+    public static boolean testWinVertical(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
         for (int column = 0; column < World.getWidth(); column++) {
             int stoneCount = 0;
             for (int row = 0; row < World.getHeight(); row++) {
@@ -249,7 +249,7 @@ public class FourWins {
      * @return true if the current player has formed a diagonal line of at least four stones; false otherwise.
      */
     @DoNotTouch
-    boolean testWinDiagonal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
+    public static boolean testWinDiagonal(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
         final int MAX_STONES = 4;
 
         final int WIDTH = World.getWidth();

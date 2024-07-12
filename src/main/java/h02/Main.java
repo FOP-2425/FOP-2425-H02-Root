@@ -1,7 +1,11 @@
 package h02;
 
+import fopbot.RobotFamily;
+import fopbot.World;
 import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
+
+import java.util.Arrays;
 
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.testEquals;
@@ -21,7 +25,8 @@ public class Main {
         sanityChecksH212();
         printTestResults();
         // H2
-        new FourWins().startGame();
+        World.setSize(4, 3);
+        sanityChecksH22();
     }
 
     /**
@@ -94,4 +99,89 @@ public class Main {
         }
         testEquals(refMean, TwoDimensionalArrayStuff.meanOccurrencesPerLine(input, query));
     }
+
+    /**
+     * Perform sanity checks for exercise H2.2
+     */
+    @StudentImplementationRequired("H2.3")
+    public static void sanityChecksH22() {
+        // predefined stones1 array
+        final RobotFamily[][] stones1 = {
+            {null, RobotFamily.SQUARE_BLUE, null, RobotFamily.SQUARE_RED},
+            {null, null,                    null, RobotFamily.SQUARE_BLUE},
+            {null, null,                    null, RobotFamily.SQUARE_RED},
+            {null, null,                    null, RobotFamily.SQUARE_BLUE},
+            {null, null,                    null, RobotFamily.SQUARE_RED},
+        };
+
+        // predefined stones2 array
+        final RobotFamily[][] stones2 = {
+            {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
+            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
+            {RobotFamily.SQUARE_BLUE,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+        };
+
+
+        // H2.2.1 validateInput
+        boolean isInCol1 = FourWins.validateInput(1, stones1);
+        boolean isInCol3 = FourWins.validateInput(3, stones1);
+
+        testEquals(true, isInCol1);
+        testEquals(false, isInCol3);
+
+
+        // H2.2.2 getDestinationRow
+        int rowCol1 = FourWins.getDestinationRow(1, stones1);
+        int rowCol3 = FourWins.getDestinationRow(3, stones1);
+
+        testEquals(1, rowCol1);
+        testEquals(-1, rowCol3);
+
+
+        // H2.2.2 dropStone
+        FourWins.dropStone(1, stones1, RobotFamily.SQUARE_RED);
+        // System.out.println(Arrays.deepToString(stones1));
+         System.out.println(stones1);
+        testEquals(RobotFamily.SQUARE_RED, stones1[1][1]);
+
+
+        // H2.2.3 testWinHorizontal
+        boolean winRowBlue = FourWins.testWinHorizontal(stones2, RobotFamily.SQUARE_BLUE);
+        boolean winRowRed = FourWins.testWinHorizontal(stones2, RobotFamily.SQUARE_RED);
+
+        testEquals(true, winRowBlue);
+        testEquals(false, winRowRed);
+
+
+        // H2.2.3 testWinVertical
+        boolean winColStones2 = FourWins.testWinVertical(stones2, RobotFamily.SQUARE_BLUE);
+        boolean winColStones1 = FourWins.testWinVertical(stones1, RobotFamily.SQUARE_BLUE);
+
+        testEquals(true, winColStones2);
+        testEquals(false, winColStones1);
+
+
+        // H2.2.3 testWinConditions
+        boolean winStones2 = FourWins.testWinConditions(stones2, RobotFamily.SQUARE_BLUE);
+        boolean winStones1 = FourWins.testWinConditions(stones1, RobotFamily.SQUARE_BLUE);
+
+        testEquals(true, winStones2);
+        testEquals(false, winStones1);
+
+
+        // H2.2.4 switchPlayer
+        RobotFamily nextPlayer1 = FourWins.switchPlayer(RobotFamily.SQUARE_BLUE);
+        RobotFamily nextPlayer2 = FourWins.switchPlayer(RobotFamily.SQUARE_RED);
+
+        testEquals(RobotFamily.SQUARE_RED, nextPlayer1);
+        testEquals(RobotFamily.SQUARE_BLUE, nextPlayer2);
+
+
+        // H2.2.4 displayWinner
+        // H2.2.4 gameLoop
+        // new FourWins().startGame();
+    }
+
 }
