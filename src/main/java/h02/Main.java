@@ -143,7 +143,7 @@ public class Main {
         // H2.2.2 dropStone
         FourWins.dropStone(1, stones1, RobotFamily.SQUARE_RED);
         // System.out.println(Arrays.deepToString(stones1));
-         System.out.println(stones1);
+        // System.out.println(stones1);
         testEquals(RobotFamily.SQUARE_RED, stones1[1][1]);
 
 
