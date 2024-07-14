@@ -47,7 +47,7 @@ public class FourWins {
      * @return The player color of the next player.
      */
     @StudentImplementationRequired("H2.2.4")
-    public static RobotFamily switchPlayer(final RobotFamily currentPlayer) {
+    public static RobotFamily nextPlayer(final RobotFamily currentPlayer) {
         if (currentPlayer == RobotFamily.SQUARE_BLUE) return RobotFamily.SQUARE_RED;
         return RobotFamily.SQUARE_BLUE;
     }
@@ -100,7 +100,7 @@ public class FourWins {
         finished = false;
         while (!finished) {
             // student implementation here:
-            currentPlayer = switchPlayer(currentPlayer);
+            currentPlayer = nextPlayer(currentPlayer);
 
             // wait for click in column (DO NOT TOUCH)
             final int column = inputHandler.getNextInput(currentPlayer, stones);
@@ -179,7 +179,7 @@ public class FourWins {
      * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
     @StudentImplementationRequired("H2.2.1")
-    public static  boolean validateInput(final int column, final RobotFamily[][] stones) {
+    public static boolean validateInput(final int column, final RobotFamily[][] stones) {
         if (column < 0 || column >= World.getWidth()) return false;
         return stones[World.getHeight() - 1][column] == null;
     }

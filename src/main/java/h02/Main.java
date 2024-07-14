@@ -5,8 +5,6 @@ import fopbot.World;
 import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import java.util.Arrays;
-
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.testEquals;
 
@@ -24,9 +22,12 @@ public class Main {
         sanityChecksH211();
         sanityChecksH212();
         printTestResults();
+
         // H2
-        World.setSize(4, 3);
         sanityChecksH22();
+
+        // starting game (comment out if you just want to run the tests)
+        new FourWins().startGame();
     }
 
     /**
@@ -72,7 +73,7 @@ public class Main {
                 "a b c d e f".split(" "),
                 "a b c d e f".split(" "),
                 "a b c d e f".split(" "),
-                },
+            },
             "b",
             new int[]{1, 1, 1},
             1
@@ -83,7 +84,7 @@ public class Main {
                 "a a b b c c".split(" "),
                 "a b c d e f".split(" "),
                 "a a a b b b c c c".split(" "),
-                },
+            },
             "b",
             new int[]{2, 1, 3},
             2
@@ -105,24 +106,29 @@ public class Main {
      */
     @StudentImplementationRequired("H2.3")
     public static void sanityChecksH22() {
+        // setting world size
+        World.setSize(4, 5);
+
         // predefined stones1 array
         final RobotFamily[][] stones1 = {
             {null, RobotFamily.SQUARE_BLUE, null, RobotFamily.SQUARE_RED},
-            {null, null,                    null, RobotFamily.SQUARE_BLUE},
-            {null, null,                    null, RobotFamily.SQUARE_RED},
-            {null, null,                    null, RobotFamily.SQUARE_BLUE},
-            {null, null,                    null, RobotFamily.SQUARE_RED},
+            {null, null, null, RobotFamily.SQUARE_BLUE},
+            {null, null, null, RobotFamily.SQUARE_RED},
+            {null, null, null, RobotFamily.SQUARE_BLUE},
+            {null, null, null, RobotFamily.SQUARE_RED},
         };
 
         // predefined stones2 array
         final RobotFamily[][] stones2 = {
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
-            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
-            {RobotFamily.SQUARE_BLUE,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-            {RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_RED,  RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
+            {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
         };
 
+
+        // student implementation here:
 
         // H2.2.1 validateInput
         boolean isInCol1 = FourWins.validateInput(1, stones1);
@@ -172,8 +178,8 @@ public class Main {
 
 
         // H2.2.4 switchPlayer
-        RobotFamily nextPlayer1 = FourWins.switchPlayer(RobotFamily.SQUARE_BLUE);
-        RobotFamily nextPlayer2 = FourWins.switchPlayer(RobotFamily.SQUARE_RED);
+        RobotFamily nextPlayer1 = FourWins.nextPlayer(RobotFamily.SQUARE_BLUE);
+        RobotFamily nextPlayer2 = FourWins.nextPlayer(RobotFamily.SQUARE_RED);
 
         testEquals(RobotFamily.SQUARE_RED, nextPlayer1);
         testEquals(RobotFamily.SQUARE_BLUE, nextPlayer2);
@@ -181,7 +187,6 @@ public class Main {
 
         // H2.2.4 displayWinner
         // H2.2.4 gameLoop
-        // new FourWins().startGame();
     }
 
 }
