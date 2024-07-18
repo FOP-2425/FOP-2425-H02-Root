@@ -19,6 +19,12 @@ public class FourWins {
      */
     @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
     private boolean finished = false;
+    private final int width, height;
+
+    FourWins(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
 
     /**
      * Starts the game by setting up the world and executing the game loop.
@@ -32,7 +38,7 @@ public class FourWins {
      * Sets up the world and installs the {@link InputHandler}.
      */
     void setupWorld() {
-        World.setSize(7, 6);
+        World.setSize(width, height);
         World.setDelay(10);
         World.setVisible(true);
         inputHandler.install();

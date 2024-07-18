@@ -5,6 +5,7 @@ import fopbot.World;
 import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
+import static org.tudalgo.algoutils.student.io.PropertyUtils.getIntProperty;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.testEquals;
 
@@ -28,7 +29,8 @@ public class Main {
         printTestResults();
 
         // starting game (comment out if you just want to run the tests)
-        new FourWins().startGame();
+        final var propFile = "h02.properties";
+        new FourWins(getIntProperty(propFile, "FW_WORLD_WIDTH"), getIntProperty(propFile, "FW_WORLD_HEIGHT")).startGame();
     }
 
     /**
