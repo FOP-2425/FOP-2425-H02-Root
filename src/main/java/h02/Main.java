@@ -25,6 +25,7 @@ public class Main {
 
         // H2
         sanityChecksH22();
+        printTestResults();
 
         // starting game (comment out if you just want to run the tests)
         new FourWins().startGame();
@@ -67,24 +68,31 @@ public class Main {
      */
     @StudentImplementationRequired("H2.3")
     public static void sanityChecksH212() {
-        // simple test
+        // predefined simple test
+        String[][] simpleTest = new String[][]{
+            "a b c d e f".split(" "),
+            "a b c d e f".split(" "),
+            "a b c d e f".split(" "),
+        };
+        // predefined complex test
+        String[][] complexTest = new String[][]{
+            "a a b b c c".split(" "),
+            "a b c d e f".split(" "),
+            "a a a b b b c c c".split(" "),
+        };
+
+
+        // student implementation here:
+
         sanityChecksH212Helper(
-            new String[][]{
-                "a b c d e f".split(" "),
-                "a b c d e f".split(" "),
-                "a b c d e f".split(" "),
-            },
+            simpleTest,
             "b",
             new int[]{1, 1, 1},
             1
         );
-        // more complex test
+
         sanityChecksH212Helper(
-            new String[][]{
-                "a a b b c c".split(" "),
-                "a b c d e f".split(" "),
-                "a a a b b b c c c".split(" "),
-            },
+            complexTest,
             "b",
             new int[]{2, 1, 3},
             2
