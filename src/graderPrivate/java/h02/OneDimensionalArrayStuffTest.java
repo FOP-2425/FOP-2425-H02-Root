@@ -270,6 +270,7 @@ public class OneDimensionalArrayStuffTest {
         final var variableDeclarations = ctElement.filterChildren(
             c -> c instanceof CtLocalVariable<?>
         ).list(CtLocalVariable.class);
+        cb.add("variable declarations", variableDeclarations);
         Assertions2.assertEquals(
             2,
             variableDeclarations.size(),
