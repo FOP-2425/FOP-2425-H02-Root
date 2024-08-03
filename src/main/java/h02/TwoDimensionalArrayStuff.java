@@ -3,6 +3,8 @@ package h02;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
+import java.util.Arrays;
+
 /**
  * This class serves as a container for the methods that are to be implemented by the students for exercise H2.1.2.
  */
@@ -60,5 +62,28 @@ public class TwoDimensionalArrayStuff {
     @DoNotTouch
     public static float meanOccurrencesPerLine(final String[][] input, final String query) {
         return mean(occurrences(input, query));
+    }
+
+    /**
+     * Overload that splits the input string by lines and spaces, then calls regular meanOccurrencesPerLine.
+     *
+     * @param input the input string to split by lines and spaces
+     * @param query the query {@link String}
+     * @return the mean number of occurrences of the query {@link String} in each line of the input array
+     */
+    @DoNotTouch
+    public static float meanOccurrencesPerLine(final String input, final String query) {
+        // filter out unwanted symbols
+        final String filteredInput = input.replaceAll("[^\\w\\s]", "");
+        // split by lines
+        final var processedInput = Arrays.stream(filteredInput.split("(\\r\\n|\\r|\\n)"))
+            // split by spaces
+            .map(line -> line.split("\\s"))
+            // collect to 2D array
+            .toArray(String[][]::new);
+        /// uncomment the following line to log processed input
+//        System.out.printf("Processed input: %s%n", Arrays.deepToString(processedInput));
+        // call regular meanOccurrencesPerLine
+        return meanOccurrencesPerLine(processedInput, query);
     }
 }
