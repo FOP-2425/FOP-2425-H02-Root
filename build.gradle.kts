@@ -11,9 +11,9 @@ jagr {
     assignmentId.set("h02")
     submissions {
         val main by creating {
-            // studentId.set("")
-            // firstName.set("")
-            // lastName.set("")
+             studentId.set("ab12cdef")
+             firstName.set("sol_first")
+             lastName.set("sol_last")
         }
     }
     graders {

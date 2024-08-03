@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static h02.TestConstants.TEST_ITERATIONS;
+
 @DisabledIf("org.tudalgo.algoutils.tutor.general.Utils#isJagrRun()")
 public class TestJsonGenerators {
     @Test
@@ -34,7 +36,7 @@ public class TestJsonGenerators {
                 objectNode.set("expected result", expectedArrayNode);
                 return objectNode;
             },
-            100,
+            TEST_ITERATIONS,
             "OneDimensionalArrayStuffTestPushRandomNumbers.json"
         );
     }
@@ -65,8 +67,46 @@ public class TestJsonGenerators {
                 objectNode.set("expected result", expectedArrayNode);
                 return objectNode;
             },
-            100,
+            TEST_ITERATIONS,
             "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers" + (twoPositivesOnly ? "TwoPositiveNumbersOnly" : "") + ".json"
+        );
+    }
+
+    /**
+     * Reference Fibonacci implementation using the closed-form formula.
+     *
+     * @param n The number to calculate the Fibonacci number for.
+     * @return The Fibonacci number.
+     * @see <a href="https://en.wikipedia.org/wiki/Fibonacci_sequence#Closed-form_expression">Fibonacci Closed-form expression on Wikipedia</a>
+     */
+    public static long fib(final int n) {
+        final double sqrt5 = Math.sqrt(5);
+        final double phi = (1 + sqrt5) / 2;
+        final double psi = (1 - sqrt5) / 2;
+
+        return Math.round((Math.pow(phi, n) - Math.pow(psi, n)) / sqrt5);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void generateOneDimensionalArrayStuffTestFibonacciRandomNumbers(
+        final boolean smallerThanTwo
+    ) throws IOException {
+        TestUtils.generateJsonTestData(
+            (mapper, index, rnd) -> {
+                final int startIdx = smallerThanTwo ? index : index + 2;
+                final ObjectNode objectNode = mapper.createObjectNode();
+                objectNode.put("n", startIdx);
+                objectNode.put("expected result", fib(startIdx));
+                final ArrayNode refArrayNode = mapper.createArrayNode();
+                for (int i = 0; i <= startIdx; i++) {
+                    refArrayNode.add(fib(i));
+                }
+                objectNode.set("reference array", refArrayNode);
+                return objectNode;
+            },
+            smallerThanTwo ? 2 : TEST_ITERATIONS,
+            "OneDimensionalArrayStuffTestFibonacciRandomNumbers" + (smallerThanTwo ? "SmallerThanTwo" : "") + ".json"
         );
     }
 }

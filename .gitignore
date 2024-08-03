@@ -84,3 +84,5 @@ gradle-app.setting
 
 *.hprof
 screenshots/
+
+jagr.conf

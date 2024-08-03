@@ -1,14 +1,19 @@
 package h02;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.mockito.Answers;
 import org.mockito.Mockito;
+import org.mockito.exceptions.base.MockitoException;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
 import org.tudalgo.algoutils.tutor.general.annotation.SkipAfterFirstFailedTest;
 import org.tudalgo.algoutils.tutor.general.assertions.Assertions2;
+import org.tudalgo.algoutils.tutor.general.assertions.Assertions4;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSetTest;
+import org.tudalgo.algoutils.tutor.general.reflections.BasicMethodLink;
+import spoon.reflect.code.CtLocalVariable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +36,7 @@ public class OneDimensionalArrayStuffTest {
      * @param lastOnly      Whether to only test the last element.
      * @param unchangedOnly Whether to only test that the input array is unchanged. Will not test the result.
      */
-    private static void testPush(JsonParameterSet params, boolean lastOnly, boolean unchangedOnly) {
+    private static void testPush(final JsonParameterSet params, final boolean lastOnly, final boolean unchangedOnly) {
         final List<Integer> input = params.get("array");
         final int value = params.getInt("value");
         final List<Integer> expectedArray = params.get("expected result");
@@ -76,8 +81,8 @@ public class OneDimensionalArrayStuffTest {
         }
     }
 
-    private static void testCalculateNextFibonacci(JsonParameterSet params, boolean vanforderung) {
-        try (var odasMock = Mockito.mockStatic(OneDimensionalArrayStuff.class, Answers.CALLS_REAL_METHODS)) {
+    private static void testCalculateNextFibonacci(final JsonParameterSet params, final boolean vanforderung) {
+        try (final var odasMock = Mockito.mockStatic(OneDimensionalArrayStuff.class, Answers.CALLS_REAL_METHODS)) {
             final List<Integer> input = params.get("array");
             final List<Integer> expectedArray = params.get("expected result");
             final var ParamsContext = params.toContext();
@@ -129,6 +134,72 @@ public class OneDimensionalArrayStuffTest {
         }
     }
 
+    private static void testFibonacci(final JsonParameterSet params, final boolean vanforderung) {
+        try (final var odasMock = Mockito.mockStatic(OneDimensionalArrayStuff.class, Answers.CALLS_REAL_METHODS)) {
+            final Integer input = params.get("n");
+            final int expectedresult = params.get("expected result");
+            final List<Integer> referenceArray = params.get("reference array");
+            final var ParamsContext = params.toContext("reference array");
+            final var cb = contextBuilder()
+                .add(ParamsContext)
+                .add("Method", "fibonacci");
+
+            odasMock.when(() -> OneDimensionalArrayStuff.push(Mockito.any(), Mockito.anyInt())).thenAnswer(invocation -> {
+                final int[] array = invocation.getArgument(0);
+                final int value = invocation.getArgument(1);
+                final int[] newArray = Arrays.copyOf(array, array.length + 1);
+                newArray[array.length] = value;
+                return newArray;
+            });
+
+            odasMock.when(() -> OneDimensionalArrayStuff.calculateNextFibonacci(Mockito.any())).thenAnswer(invocation -> {
+                final int[] array = invocation.getArgument(0);
+                return OneDimensionalArrayStuff.push(array, array[array.length - 1] + array[array.length - 2]);
+            });
+
+            final int result = Assertions2.callObject(
+                () -> OneDimensionalArrayStuff.fibonacci(
+                    input
+                ),
+                cb.build(),
+                r -> "An error occurred during execution."
+            );
+
+            cb.add("actual result", result);
+            if (vanforderung) {
+                // test calculateFib was used
+                for (int i = 2; i < referenceArray.size(); i++) {
+                    final int finalI = i;
+                    try {
+                        // test for entire array
+                        odasMock.verify(
+                            () -> OneDimensionalArrayStuff.calculateNextFibonacci(
+                                referenceArray.subList(0, finalI).stream().mapToInt(j -> j).toArray()
+                            ),
+                            Mockito.atLeastOnce()
+                        );
+                    } catch (final MockitoException e) {
+                        // test for last two elements
+                        odasMock.verify(
+                            () -> OneDimensionalArrayStuff.calculateNextFibonacci(
+                                referenceArray.subList(finalI - 2, finalI).stream().mapToInt(j -> j).toArray()
+                            ),
+                            Mockito.atLeastOnce()
+                        );
+                    }
+                }
+                return;
+            }
+            Assertions2.assertEquals(
+                expectedresult,
+                result,
+                cb.build(),
+                r -> "Invalid result."
+            );
+
+        }
+    }
+
     @ParameterizedTest
     @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.json")
     public void testPushLastElementCorrect(final JsonParameterSet params) {
@@ -163,5 +234,74 @@ public class OneDimensionalArrayStuffTest {
     @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers.json")
     public void testCalculateNextFibonacciVanforderungen(final JsonParameterSet params) {
         testCalculateNextFibonacci(params, true);
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.json")
+    public void testFibonacciVanforderungen(final JsonParameterSet params) {
+        testFibonacci(params, true);
+    }
+
+    @Test
+    public void testFibonacciNonIterativeVanforderungen() throws NoSuchMethodException {
+        // test exactly one for loop
+        final var ml = BasicMethodLink.of(OneDimensionalArrayStuff.class.getDeclaredMethod("fibonacci", int.class));
+        final var ctElement = ml.getCtElement();
+        final var cb = contextBuilder()
+            .add("Method", "fibonacci");
+        Assertions4.assertIsNotRecursively(
+            ctElement,
+            cb.build(),
+            r -> "The method should not have any recursive calls."
+        );
+        final var forLoops = ctElement.filterChildren(
+            c -> c instanceof spoon.reflect.code.CtFor
+                || c instanceof spoon.reflect.code.CtForEach
+                || c instanceof spoon.reflect.code.CtWhile
+                || c instanceof spoon.reflect.code.CtDo
+        ).list();
+        Assertions2.assertEquals(
+            1,
+            forLoops.size(),
+            cb.build(),
+            r -> "The method should contain exactly one for loop."
+        );
+        // test exactly one variable declaration
+        final var variableDeclarations = ctElement.filterChildren(
+            c -> c instanceof CtLocalVariable<?>
+        ).list(CtLocalVariable.class);
+        Assertions2.assertEquals(
+            2,
+            variableDeclarations.size(),
+            cb.build(),
+            r -> "The method should contain exactly two variable declarations."
+        );
+        // one of type int[] and one of type int
+        Assertions2.assertTrue(
+            variableDeclarations.stream().anyMatch(
+                c -> c.getType().toString().equals("int[]")
+            ),
+            cb.build(),
+            r -> "The method should declare exactly one variable of type int[]."
+        );
+        Assertions2.assertTrue(
+            variableDeclarations.stream().anyMatch(
+                c -> c.getType().toString().equals("int")
+            ),
+            cb.build(),
+            r -> "The method should contain exactly one variable of type int."
+        );
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbersSmallerThanTwo.json")
+    public void testFibonacciSmallerThanTwo(final JsonParameterSet params) {
+        testFibonacci(params, false);
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.json")
+    public void testFibonacciBigNumbers(final JsonParameterSet params) {
+        testFibonacci(params, false);
     }
 }

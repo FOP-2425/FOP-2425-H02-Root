@@ -70,15 +70,32 @@ public class H02_RubricProvider implements RubricProvider {
                                 -1
                             ),
                             criterion(
-                                "Methode fibonacci: Das Ergebnis ist korrekt für n < 2."
+                                "Methode fibonacci: Das Ergebnis ist korrekt für n < 2.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testFibonacciSmallerThanTwo", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode fibonacci: Das Ergebnis ist korrekt für n >= 2."
+                                "Methode fibonacci: Das Ergebnis ist korrekt für n >= 2.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testFibonacciBigNumbers", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode fibonacci: eine Verbindliche Anforderung wurde verletzt.",
-                                JUnitTestRef.ofMethod(() -> null),
-                                -1
+                                JUnitTestRef.and(
+                                    JUnitTestRef.ofMethod(
+                                        () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                            "testFibonacciVanforderungen", JsonParameterSet.class)
+                                    ),
+                                    JUnitTestRef.ofMethod(
+                                        () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                            "testFibonacciNonIterativeVanforderungen")
+                                    )
+                                ),
+                                    - 1
                             )
                         )
                         .build(),
