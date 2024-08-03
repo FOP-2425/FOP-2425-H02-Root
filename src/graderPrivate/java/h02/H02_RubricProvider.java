@@ -48,14 +48,25 @@ public class H02_RubricProvider implements RubricProvider {
                                 )
                             ),
                             criterion(
-                                "Methode calculateNextFibonacci: Das Ergebnis ist korrekt mit zwei positiven Zahlen."
+                                "Methode calculateNextFibonacci: Das Ergebnis ist korrekt mit zwei positiven Zahlen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testCalculateNextFibonacciPositiveOnly", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode calculateNextFibonacci: Das Ergebnis ist korrekt mit beliebigen Eingaben."
+                                "Methode calculateNextFibonacci: Das Ergebnis ist korrekt mit beliebigen Eingaben.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testCalculateNextFibonacciAllNumbers", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode calculateNextFibonacci: Eine verbindliche Anforderung wurde verletzt.",
-                                JUnitTestRef.ofMethod(() -> null),
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testCalculateNextFibonacciVanforderungen", JsonParameterSet.class)
+                                ),
                                 -1
                             ),
                             criterion(

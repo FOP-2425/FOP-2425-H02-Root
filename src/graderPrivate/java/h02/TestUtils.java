@@ -13,30 +13,6 @@ import java.util.Random;
 import static h02.TestConstants.RANDOM_SEED;
 
 public abstract class TestUtils {
-    public static <E extends ObjectNode> String generateJsonArrayString(final Iterator<E> iterator) {
-        final ObjectMapper mapper = new ObjectMapper();
-        final ArrayNode arrayNode = mapper.createArrayNode();
-        while (iterator.hasNext()) {
-            arrayNode.add(iterator.next());
-        }
-        try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
-        } catch (final Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static <T> void saveToFile(final String filename, final T content) {
-        // Save content to file
-        final File file = new File(filename);
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(file, content);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * A generator for JSON test data.
