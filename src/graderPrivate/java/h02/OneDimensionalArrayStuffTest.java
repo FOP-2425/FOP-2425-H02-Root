@@ -13,6 +13,7 @@ import org.tudalgo.algoutils.tutor.general.assertions.Assertions4;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSetTest;
 import org.tudalgo.algoutils.tutor.general.reflections.BasicMethodLink;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLocalVariable;
 
 import java.util.Arrays;
@@ -291,6 +292,24 @@ public class OneDimensionalArrayStuffTest {
             ),
             cb.build(),
             r -> "The method should contain exactly one variable of type int."
+        );
+        // test no Method calls except for calculateNextFibonacci
+        final var methodCalls = ctElement.filterChildren(
+            c -> c instanceof spoon.reflect.code.CtInvocation<?>
+        ).list(CtInvocation.class);
+               cb.add("method calls", methodCalls);
+        Assertions2.assertEquals(
+            1,
+            methodCalls.size(),
+            cb.build(),
+            r -> "The method should contain exactly one method call."
+        );
+        final var methodCall = methodCalls.get(0);
+        Assertions2.assertEquals(
+            "calculateNextFibonacci",
+            methodCall.getExecutable().getSimpleName(),
+            cb.build(),
+            r -> "The method should only call calculateNextFibonacci."
         );
     }
 
