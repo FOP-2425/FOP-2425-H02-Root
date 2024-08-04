@@ -12,7 +12,7 @@ import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
 public class H02_RubricProvider implements RubricProvider {
 
     public static final Rubric RUBRIC = Rubric.builder()
-        .title("H01 | Foreign Contaminants")
+        .title("H02 | Vier Gewinnt")
         .addChildCriteria(
             Criterion.builder()
                 .shortDescription("H2.1 | Grundlagen-Training")
@@ -124,13 +124,13 @@ public class H02_RubricProvider implements RubricProvider {
         )
         .addChildCriteria(
             Criterion.builder()
-                .shortDescription("H2.2 | Roboter-Training")
+                .shortDescription("H2.2 | Vier Gewinnt")
                 .addChildCriteria(
                     Criterion.builder()
                         .shortDescription("H2.2.1 | Slot Prüfen")
                         .addChildCriteria(
                             criterion(
-                                "Die Methode validateInput ist vollständig korrekt implementiert."
+                                "Methode validateInput: Methode ist vollständig korrekt implementiert."
                             )
                         )
                         .build(),
@@ -141,22 +141,94 @@ public class H02_RubricProvider implements RubricProvider {
                                 "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
                             ),
                             criterion(
-                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
-                            )
-                            ,
+                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
+                            ),
                             criterion(
-                                "Methode dropStone: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
+                                "Methode dropStone: Robot wird mit korrekten Parametern erstellt."
+                            ),
+                            criterion(
+                                "Methode dropStone: getDestinationRow wird korrekt aufgerufen."
+                            ),
+                            criterion(
+                                "Methode dropStone: Robot führt die korrekte Bewegung aus."
                             )
                         )
                         .build(),
                     Criterion.builder()
-                        .shortDescription("H2.2.2 | Münzen fallen lassen")
+                        .shortDescription("H2.2.3 | Gewinnbedingung prüfen")
+                        .addChildCriteria(
+                            Criterion.builder()
+                                .shortDescription("Methode testWinHorizontal: ")
+                                .addChildCriteria(
+                                    criterion(
+                                        "Methode erkennt richtige horizontale Steinfolgen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        3
+                                    ),
+                                    criterion(
+                                        "Methode erkennt keine falschen Steinfolgen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        -3
+                                    )
+                                ).minPoints(0).build(),
+                            Criterion.builder()
+                                .shortDescription("Methode testWinVertical: ")
+                                .addChildCriteria(
+                                    criterion(
+                                        "Methode erkennt richtige vertikale Steinfolgen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        3
+                                    ),
+                                    criterion(
+                                        "Methode erkennt keine falschen Steinfolgen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        -3
+                                    )
+                                ).minPoints(0).build(),
+                            Criterion.builder()
+                                .shortDescription("Methode testWinVertical: ")
+                                .addChildCriteria(
+                                    criterion(
+                                        "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen."
+                                    ),
+                                    criterion(
+                                        "die Rückgabe ist in allen Fällen korrekt."
+                                    )
+                                ).build()
+                        )
+                        .build(),
+                    Criterion.builder()
+                        .shortDescription("H2.2.4 | Game Loop")
                         .addChildCriteria(
                             criterion(
-                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                                "Methode nextPlayer: die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
                             ),
                             criterion(
-                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
+                                "Methode displayWinner: die Ausgabe in die Konsole ist korrekt."
+                            ),
+                            criterion(
+                                "Methode displayWinner: das Spielfeld wird korrekt eingefärbt."
+                            ),
+                            criterion(
+                                "Methode gameLoop: nextPlayer und testWinConditions werden korrekt aufgerufen."
+                            ),
+                            criterion(
+                                "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen."
+                            ),
+                            criterion(
+                                "Methode gameLoop: displayWinner wird mit korrekten Parametern aufgerufen."
                             )
                         )
                         .build()
