@@ -16,9 +16,11 @@ public class H02_RubricProvider implements RubricProvider {
         .addChildCriteria(
             Criterion.builder()
                 .shortDescription("H2.1 | Grundlagen-Training")
+                .minPoints(0)
                 .addChildCriteria(
                     Criterion.builder()
                         .shortDescription("H2.1.1 | Fibonacci mit 1D Array")
+                        .minPoints(0)
                         .addChildCriteria(
                             criterion(
                                 "Methode push: Das letzte Element des Ergebnis-Arrays ist das übergebene Element.",
@@ -101,6 +103,7 @@ public class H02_RubricProvider implements RubricProvider {
                         .build(),
                     Criterion.builder()
                         .shortDescription("H2.1.2 | Textsuche mit 2D Arrays")
+                        .minPoints(0)
                         .addChildCriteria(
                             criterion(
                                 "Methode occurrences: Die Methode funktioniert korrekt mit einem leeren Array."
@@ -125,6 +128,7 @@ public class H02_RubricProvider implements RubricProvider {
         .addChildCriteria(
             Criterion.builder()
                 .shortDescription("H2.2 | Vier Gewinnt")
+                .minPoints(0)
                 .addChildCriteria(
                     Criterion.builder()
                         .shortDescription("H2.2.1 | Slot Prüfen")
@@ -136,12 +140,20 @@ public class H02_RubricProvider implements RubricProvider {
                         .build(),
                     Criterion.builder()
                         .shortDescription("H2.2.2 | Münzen fallen lassen")
+                        .minPoints(0)
                         .addChildCriteria(
                             criterion(
                                 "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
                             ),
                             criterion(
                                 "Methode getDestinationRow: die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
+                            ),
+                            criterion(
+                                "Methode getDestinationRow: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                ),
+                                -1
                             ),
                             criterion(
                                 "Methode dropStone: Robot wird mit korrekten Parametern erstellt."
@@ -151,6 +163,13 @@ public class H02_RubricProvider implements RubricProvider {
                             ),
                             criterion(
                                 "Methode dropStone: Robot führt die korrekte Bewegung aus."
+                            ),
+                            criterion(
+                                "Methode dropStone: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                ),
+                                -1
                             )
                         )
                         .build(),
@@ -161,18 +180,25 @@ public class H02_RubricProvider implements RubricProvider {
                                 .shortDescription("Methode testWinHorizontal: ")
                                 .addChildCriteria(
                                     criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        1
+                                    ),
+                                    criterion(
                                         "Methode erkennt richtige horizontale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
                                                 "noTestYet", JsonParameterSet.class)
                                         ),
-                                        3
+                                        2
                                     ),
                                     criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
                                         JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                            () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
                                         ),
                                         -3
                                     )
@@ -181,12 +207,20 @@ public class H02_RubricProvider implements RubricProvider {
                                 .shortDescription("Methode testWinVertical: ")
                                 .addChildCriteria(
                                     criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "noTestYet", JsonParameterSet.class)
+                                        ),
+                                        1
+                                    ),
+                                    criterion(
                                         "Methode erkennt richtige vertikale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
                                                 "noTestYet", JsonParameterSet.class)
                                         ),
-                                        3
+                                        2
                                     ),
                                     criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
@@ -211,6 +245,7 @@ public class H02_RubricProvider implements RubricProvider {
                         .build(),
                     Criterion.builder()
                         .shortDescription("H2.2.4 | Game Loop")
+                        .minPoints(0)
                         .addChildCriteria(
                             criterion(
                                 "Methode nextPlayer: die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
@@ -220,6 +255,13 @@ public class H02_RubricProvider implements RubricProvider {
                             ),
                             criterion(
                                 "Methode displayWinner: das Spielfeld wird korrekt eingefärbt."
+                            ),
+                            criterion(
+                                "Methode displayWinner: Verbindliche Anforderung 'genau zwei verschachtelte Schleifen' wurde verletzt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                ),
+                                -1
                             ),
                             criterion(
                                 "Methode gameLoop: nextPlayer und testWinConditions werden korrekt aufgerufen."
