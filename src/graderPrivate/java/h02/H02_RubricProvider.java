@@ -95,7 +95,7 @@ public class H02_RubricProvider implements RubricProvider {
                                             "testFibonacciNonIterativeVanforderungen")
                                     )
                                 ),
-                                    - 1
+                                -1
                             )
                         )
                         .build(),
@@ -116,6 +116,47 @@ public class H02_RubricProvider implements RubricProvider {
                             ),
                             criterion(
                                 "Methode mean: Die Methode funktioniert auch dann korrekt, wenn das Ergebnis eine fließkommazahl ist."
+                            )
+                        )
+                        .build()
+                )
+                .build()
+        )
+        .addChildCriteria(
+            Criterion.builder()
+                .shortDescription("H2.2 | Roboter-Training")
+                .addChildCriteria(
+                    Criterion.builder()
+                        .shortDescription("H2.2.1 | Slot Prüfen")
+                        .addChildCriteria(
+                            criterion(
+                                "Die Methode validateInput ist vollständig korrekt implementiert."
+                            )
+                        )
+                        .build(),
+                    Criterion.builder()
+                        .shortDescription("H2.2.2 | Münzen fallen lassen")
+                        .addChildCriteria(
+                            criterion(
+                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                            ),
+                            criterion(
+                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
+                            )
+                            ,
+                            criterion(
+                                "Methode dropStone: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
+                            )
+                        )
+                        .build(),
+                    Criterion.builder()
+                        .shortDescription("H2.2.2 | Münzen fallen lassen")
+                        .addChildCriteria(
+                            criterion(
+                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                            ),
+                            criterion(
+                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn kein freier Slot existiert."
                             )
                         )
                         .build()
