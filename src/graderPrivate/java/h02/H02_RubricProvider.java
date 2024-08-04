@@ -86,7 +86,7 @@ public class H02_RubricProvider implements RubricProvider {
                                 )
                             ),
                             criterion(
-                                "Methode fibonacci: eine Verbindliche Anforderung wurde verletzt.",
+                                "Methode fibonacci: Eine Verbindliche Anforderung wurde verletzt.",
                                 JUnitTestRef.and(
                                     JUnitTestRef.ofMethod(
                                         () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod(
@@ -143,10 +143,10 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn ein freier Slot existiert."
                             ),
                             criterion(
-                                "Methode getDestinationRow: die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
                             ),
                             criterion(
                                 "Methode getDestinationRow: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
@@ -238,7 +238,7 @@ public class H02_RubricProvider implements RubricProvider {
                                         "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen."
                                     ),
                                     criterion(
-                                        "die Rückgabe ist in allen Fällen korrekt."
+                                        "Die Rückgabe ist in allen Fällen korrekt."
                                     )
                                 ).build()
                         )
@@ -248,13 +248,13 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode nextPlayer: die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
+                                "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
                             ),
                             criterion(
-                                "Methode displayWinner: die Ausgabe in die Konsole ist korrekt."
+                                "Methode displayWinner: Die Ausgabe in die Konsole ist korrekt."
                             ),
                             criterion(
-                                "Methode displayWinner: das Spielfeld wird korrekt eingefärbt."
+                                "Methode displayWinner: Das Spielfeld wird korrekt eingefärbt."
                             ),
                             criterion(
                                 "Methode displayWinner: Verbindliche Anforderung 'genau zwei verschachtelte Schleifen' wurde verletzt.",
