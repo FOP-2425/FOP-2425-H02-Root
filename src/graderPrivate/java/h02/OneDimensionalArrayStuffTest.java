@@ -30,7 +30,7 @@ public class OneDimensionalArrayStuffTest {
      * @param lastOnly      Whether to only test the last element.
      * @param unchangedOnly Whether to only test that the input array is unchanged. Will not test the result.
      */
-    private static void testPush(JsonParameterSet params, boolean lastOnly, boolean unchangedOnly) {
+    private static void testPush(final JsonParameterSet params, final boolean lastOnly, final boolean unchangedOnly) {
         final List<Integer> input = params.get("array");
         final int value = params.getInt("value");
         final List<Integer> expectedArray = new ArrayList<>(input);

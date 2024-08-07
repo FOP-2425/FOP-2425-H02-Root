@@ -5,9 +5,8 @@ import fopbot.World;
 import h02.FourWins;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -15,6 +14,10 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 /**
  * The {@link InputHandler} handles the input of the users.
@@ -46,7 +49,7 @@ public class InputHandler {
         this.fourWins = fourWins;
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel.setVerticalAlignment(SwingConstants.CENTER);
-        int padding = 4; // Padding in pixels
+        final int padding = 4; // Padding in pixels
         statusLabel.setBorder(new EmptyBorder(padding, padding, padding, padding));
     }
 
@@ -95,8 +98,8 @@ public class InputHandler {
                     setColumnColor(
                         e.getField().getX(),
                         () -> guiPanel.isDarkMode()
-                            ? Color.yellow
-                            : Color.orange
+                              ? Color.yellow
+                              : Color.orange
                     );
                 }
             }
@@ -167,6 +170,13 @@ public class InputHandler {
         }
     }
 
+    /**
+     * Checks if the game ends with a draw.
+     *
+     * @param stones the current state of the game
+     * @return {@code true} if the game ends with a draw, {@code false} otherwise
+     */
+    @SuppressWarnings("UnstableApiUsage")
     private boolean checkForDraw(final RobotFamily[][] stones) {
         for (int x = 0; x < World.getWidth(); x++) {
             if (FourWins.validateInput(x, stones)) {

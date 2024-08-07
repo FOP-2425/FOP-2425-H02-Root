@@ -32,8 +32,8 @@ import java.util.function.Consumer;
 import static org.tudalgo.algoutils.tutor.general.ResourceUtils.toPathString;
 
 public class TemplateAnnotationProcessor {
-    private static Launcher createSpoonLauncher(boolean sniper) {
-        Launcher spoon = new Launcher();
+    private static Launcher createSpoonLauncher(final boolean sniper) {
+        final Launcher spoon = new Launcher();
         spoon.getEnvironment().setAutoImports(true);
         spoon.getEnvironment().setComplianceLevel(17);
         spoon.getEnvironment().setNoClasspath(true);
@@ -60,7 +60,7 @@ public class TemplateAnnotationProcessor {
                     continue;
                 }
                 System.out.println("processing " + type.name());
-                AtomicBoolean modified = new AtomicBoolean(false);
+                final AtomicBoolean modified = new AtomicBoolean(false);
                 Launcher spoon = createSpoonLauncher(true);
                 spoon.addInputResource(getFilePath(type).toString());
                 CtModel model = spoon.buildModel();
