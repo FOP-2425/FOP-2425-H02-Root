@@ -5,8 +5,6 @@ import fopbot.World;
 import org.tudalgo.algoutils.student.annotation.SolutionOnly;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import javax.swing.JLabel;
-
 import static org.tudalgo.algoutils.student.io.PropertyUtils.getIntProperty;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.printTestResults;
 import static org.tudalgo.algoutils.student.test.StudentTestUtils.testEquals;
@@ -201,14 +199,6 @@ public class Main {
 
 
         // H2.2.4 displayWinner
-        final var testLabel = new JLabel("Initial Text");
-        FourWins.displayWinner(RobotFamily.SQUARE_BLUE, testLabel);
-        testEquals("Player SQUARE_BLUE wins the game!", testLabel.getText());
-        for (int y = 0; y < World.getHeight(); y++) {
-            for (int x = 0; x < World.getWidth(); x++) {
-                testEquals(RobotFamily.SQUARE_BLUE.getColor(), World.getGlobalWorld().getField(x, y).getFieldColor());
-            }
-        }
         // H2.2.4 gameLoop
     }
 

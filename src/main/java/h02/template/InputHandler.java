@@ -5,8 +5,9 @@ import fopbot.World;
 import h02.FourWins;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -14,9 +15,6 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 /**
  * The {@link InputHandler} handles the input of the users.
@@ -31,6 +29,9 @@ public class InputHandler {
      * The {@link FourWins} instance.
      */
     private final FourWins fourWins;
+    private RobotFamily currentPlayer;
+    private boolean justFinished = true;
+    private boolean draw = false;
 
     private final AtomicBoolean rowSelectMode = new AtomicBoolean(false);
 
@@ -43,6 +44,10 @@ public class InputHandler {
      */
     public InputHandler(final FourWins fourWins) {
         this.fourWins = fourWins;
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setVerticalAlignment(SwingConstants.CENTER);
+        int padding = 4; // Padding in pixels
+        statusLabel.setBorder(new EmptyBorder(padding, padding, padding, padding));
     }
 
     /**
@@ -60,9 +65,15 @@ public class InputHandler {
     }
 
     private void whenGameIsRunning(final Runnable action) {
-        if (!fourWins.isFinished()) {
-            action.run();
+        if (fourWins.isFinished()) {
+            if (justFinished) {
+                statusLabel.setText(String.format("<html>Player %s wins the game!</html>", currentPlayer));
+                justFinished = false;
+            }
+            return;
         }
+        if (draw) return;
+        action.run();
     }
 
     /**
@@ -84,8 +95,8 @@ public class InputHandler {
                     setColumnColor(
                         e.getField().getX(),
                         () -> guiPanel.isDarkMode()
-                              ? Color.yellow
-                              : Color.orange
+                            ? Color.yellow
+                            : Color.orange
                     );
                 }
             }
@@ -137,12 +148,15 @@ public class InputHandler {
      */
     public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
         rowSelectMode.set(true);
-        statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
+        this.currentPlayer = currentPlayer;
+        if (!draw)
+            statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
         try {
             final int input = inputQueue.take();
-            System.out.println("Received input: " + input);
+            System.out.println("Received column input: " + input);
+            if (checkForDraw(stones)) return getNextInput(currentPlayer, stones);
             if (!FourWins.validateInput(input, stones)) {
-                System.out.println("Invalid input, please try again.");
+                System.out.println("Invalid column input, please try again.");
                 return getNextInput(currentPlayer, stones);
             }
             rowSelectMode.set(false);
@@ -151,6 +165,25 @@ public class InputHandler {
             rowSelectMode.set(false);
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean checkForDraw(final RobotFamily[][] stones) {
+        for (int x = 0; x < World.getWidth(); x++) {
+            if (FourWins.validateInput(x, stones)) {
+                return false;
+            }
+        }
+
+        System.out.println("No valid columns found. Hence, game ends with a draw.");
+
+        final var guiPanel = World.getGlobalWorld().getGuiPanel();
+        for (int x = 0; x < World.getWidth(); x++) {
+            setColumnColor(x, () -> guiPanel.isDarkMode() ? Color.yellow : Color.orange);
+        }
+
+        statusLabel.setText("<html>No valid columns found. <br>Hence, game ends with a draw.</html>");
+        draw = true;
+        return true;
     }
 
     /**

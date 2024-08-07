@@ -8,8 +8,6 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import javax.swing.JLabel;
-
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
@@ -67,8 +65,9 @@ public class FourWins {
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
-    public static void displayWinner(final RobotFamily winner, final JLabel statusLabel) {
-        statusLabel.setText(String.format("Player %s wins the game!", winner));
+    public static void displayWinner(final RobotFamily winner) {
+        System.out.println("Player " + winner + " wins the game!");
+
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
                 setFieldColor(x, y, winner);
@@ -118,7 +117,7 @@ public class FourWins {
         }
 
         // student implementation here:
-        displayWinner(currentPlayer, inputHandler.getStatusLabel());
+        displayWinner(currentPlayer);
     }
 
     /**
