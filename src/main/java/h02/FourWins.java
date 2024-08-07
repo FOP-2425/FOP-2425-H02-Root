@@ -8,7 +8,6 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
-import java.awt.Color;
 import java.util.Optional;
 
 /**
@@ -61,6 +60,27 @@ public class FourWins {
         return RobotFamily.SQUARE_BLUE;
     }
 
+
+    /**
+     * Displays a Message in the console and on the game board indicating the game is drawn.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public void writeDrawMessage() {
+        inputHandler.displayDrawStatus();
+        System.out.println("No valid columns found. Hence, game ends with a draw.");
+    }
+
+    /**
+     * Displays a Message in the console and on the game board indicating the game is won by a player.
+     *
+     * @param winner {@link RobotFamily} of the winning player
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public void writeWinnerMessage(final RobotFamily winner) {
+        inputHandler.displayWinnerStatus(winner);
+        System.out.println("Player " + winner + " wins the game!");
+    }
+
     /**
      * Displays the winner of the game by printing the winning color in the console and filling the whole field
      * with Robots of the winning color.
@@ -68,10 +88,7 @@ public class FourWins {
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
-    public void displayWinner(final RobotFamily winner) {
-        inputHandler.displayWinnerStatus(winner);
-        System.out.println("Player " + winner + " wins the game!");
-
+    public void colorFieldBackground(final RobotFamily winner) {
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
                 setFieldColor(x, y, winner);
@@ -79,19 +96,6 @@ public class FourWins {
         }
     }
 
-    /**
-     * Displays a draw message in the console and fills the whole field with a color indicating a draw.
-     */
-    public void displayDraw() {
-        inputHandler.displayDrawStatus();
-        System.out.println("No valid columns found. Hence, game ends with a draw.");
-
-        for (int x = 0; x < World.getWidth(); x++) {
-            for (int y = 0; y < World.getHeight(); y++) {
-                setFieldColorDraw(x, y);
-            }
-        }
-    }
 
     /**
      * Executes the main game loop, handling player turns, stone drops, and win condition checks.
@@ -107,28 +111,19 @@ public class FourWins {
         World.getGlobalWorld().setFieldColor(x, y, color.getColor());
     }
 
+
     /**
-     * Returns the color to draw the winning line.
+     * Returns the {@link RobotFamily} which represents a drawn game.
      *
-     * @return The color to draw the winning line.
+     * @return the {@link RobotFamily} which represents a drawn game.
      */
     @DoNotTouch
     @SuppressWarnings("UnstableApiUsage")
-    protected static Color getDrawColor() {
+    protected static RobotFamily getDrawnRobotFamily() {
         return Optional.ofNullable(World.getGlobalWorld().getGuiPanel())
-            .map(guiPanel -> guiPanel.isDarkMode() ? Color.yellow : Color.orange)
-            .orElse(Color.yellow);
-    }
-
-    /**
-     * Sets the background color of a field at the specified coordinates to the color used for drawing the winning line.
-     *
-     * @param x the x coordinate of the field
-     * @param y the y coordinate of the field
-     */
-    @DoNotTouch
-    public static void setFieldColorDraw(final int x, final int y) {
-        World.getGlobalWorld().setFieldColor(x, y, getDrawColor());
+            .filter(guiPanel -> !guiPanel.isDarkMode())
+            .map(guiPanel -> RobotFamily.SQUARE_ORANGE)
+            .orElse(RobotFamily.SQUARE_YELLOW);
     }
 
     /**
@@ -144,33 +139,34 @@ public class FourWins {
     void gameLoop() {
         final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
         RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
+
         boolean draw = false;
         finished = false;
+
         while (!finished) {
             // student implementation here:
             currentPlayer = nextPlayer(currentPlayer);
 
             // wait for click in column (DO NOT TOUCH)
+            finished = draw = isGameBoardFull(stones);
+            if (draw) break;
             final int column = inputHandler.getNextInput(currentPlayer, stones);
 
             // student implementation here:
             dropStone(column, stones, currentPlayer);
-            final boolean winning = testWinConditions(stones, currentPlayer);
-            if (winning) {
-                finished = true;
-                break;
-            }
-            draw = !emptySpotsAvailable(stones);
-            finished = draw;
+            finished = testWinConditions(stones, currentPlayer);
         }
 
-        // student implementation here:
+        // displaying either draw or winner (DO NOT TOUCH)
         if (draw) {
-            displayDraw();
+            writeDrawMessage();
+            colorFieldBackground(getDrawnRobotFamily());
         } else {
-            displayWinner(currentPlayer);
+            writeWinnerMessage(currentPlayer);
+            colorFieldBackground(currentPlayer);
         }
     }
+
 
     /**
      * Returns {@code true} when the game is finished, {@code false} otherwise.
@@ -326,10 +322,7 @@ public class FourWins {
 
                     // test for consecutive coins
                     int coinCount = 0; // start counting at 0
-                    while (
-                        pos[0] >= 0 && pos[0] < WIDTH && pos[1] >= 0 && pos[1] < HEIGHT
-                            && stones[pos[1]][pos[0]] == currentPlayer
-                    ) {
+                    while (pos[0] >= 0 && pos[0] < WIDTH && pos[1] >= 0 && pos[1] < HEIGHT && stones[pos[1]][pos[0]] == currentPlayer) {
                         coinCount++; // count every stone that has currentPlayer's color
                         if (coinCount >= MAX_STONES) return true;
                         pos[0] += direction[0];
@@ -345,17 +338,16 @@ public class FourWins {
     }
 
     /**
-     * Checks if there are any empty spots available on the game board.
+     * Checks if all columns of the game board are fully occupied.
      *
      * @param stones 2D array representing the game board, where each cell contains a RobotFamily
-     * @return true if there are any empty spots available on the game board; false otherwise.
+     * @return true if all columns of the game board are fully occupied; false otherwise.
      */
-    public static boolean emptySpotsAvailable(final RobotFamily[][] stones) {
+    @DoNotTouch
+    public static boolean isGameBoardFull(final RobotFamily[][] stones) {
         for (int x = 0; x < World.getWidth(); x++) {
-            if (FourWins.validateInput(x, stones)) {
-                return true;
-            }
+            if (FourWins.validateInput(x, stones)) return false;
         }
-        return false;
+        return true;
     }
 }
