@@ -44,8 +44,6 @@ public class InputHandler {
      */
     public InputHandler(final FourWins fourWins) {
         this.fourWins = fourWins;
-        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        statusLabel.setVerticalAlignment(SwingConstants.CENTER);
         final int padding = 4; // Padding in pixels
         statusLabel.setBorder(new EmptyBorder(padding, padding, padding, padding));
     }
