@@ -151,7 +151,7 @@ public class H02_RubricProvider implements RubricProvider {
                             criterion(
                                 "Methode getDestinationRow: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
                                 ),
                                 -1
                             ),
@@ -167,7 +167,7 @@ public class H02_RubricProvider implements RubricProvider {
                             criterion(
                                 "Methode dropStone: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> OneDimensionalArrayStuffTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
                                 ),
                                 -1
                             )
@@ -200,7 +200,7 @@ public class H02_RubricProvider implements RubricProvider {
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
                                         ),
-                                        -3
+                                        -2
                                     )
                                 ).minPoints(0).build(),
                             Criterion.builder()
@@ -228,7 +228,7 @@ public class H02_RubricProvider implements RubricProvider {
                                             () -> FourWinsTest.class.getDeclaredMethod(
                                                 "noTestYet", JsonParameterSet.class)
                                         ),
-                                        -3
+                                        -2
                                     )
                                 ).minPoints(0).build(),
                             Criterion.builder()
