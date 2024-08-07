@@ -5,9 +5,11 @@ import fopbot.World;
 import h02.FourWins;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-import java.awt.Color;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -27,10 +29,13 @@ public class InputHandler {
      * The {@link FourWins} instance.
      */
     private final FourWins fourWins;
+    private RobotFamily currentPlayer;
+    private boolean justFinished = true;
+    private boolean draw = false;
 
     private final AtomicBoolean rowSelectMode = new AtomicBoolean(false);
 
-    private final JLabel statusLabel = new JLabel("");
+    private final JLabel statusLabel = new JLabel("", SwingConstants.CENTER);
 
     /**
      * Creates a new {@link InputHandler} instance.
@@ -39,6 +44,10 @@ public class InputHandler {
      */
     public InputHandler(final FourWins fourWins) {
         this.fourWins = fourWins;
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setVerticalAlignment(SwingConstants.CENTER);
+        int padding = 4; // Padding in pixels
+        statusLabel.setBorder(new EmptyBorder(padding, padding, padding, padding));
     }
 
     /**
@@ -56,9 +65,15 @@ public class InputHandler {
     }
 
     private void whenGameIsRunning(final Runnable action) {
-        if (!fourWins.isFinished()) {
-            action.run();
+        if (fourWins.isFinished()) {
+            if (justFinished) {
+                statusLabel.setText(String.format("<html>Player %s wins the game!</html>", currentPlayer));
+                justFinished = false;
+            }
+            return;
         }
+        if (draw) return;
+        action.run();
     }
 
     /**
@@ -67,6 +82,7 @@ public class InputHandler {
     @SuppressWarnings("UnstableApiUsage")
     public void install() {
         final var guiPanel = World.getGlobalWorld().getGuiPanel();
+        final var guiFrame = World.getGlobalWorld().getGuiFrame();
         World.getGlobalWorld().getInputHandler().addFieldClickListener(e -> whenGameIsRunning(() -> addInput(e.getField().getX())));
         World.getGlobalWorld().getInputHandler().addFieldHoverListener(e -> whenGameIsRunning(() -> {
             // deselect last hovered field, if any
@@ -76,23 +92,43 @@ public class InputHandler {
             if (rowSelectMode.get()) {
                 // select current hovered field
                 if (e.getField() != null) {
-                    setColumnColor(e.getField().getX(), () -> guiPanel.isDarkMode()
-                                                              ? Color.yellow
-                                                              : Color.orange
+                    setColumnColor(
+                        e.getField().getX(),
+                        () -> guiPanel.isDarkMode()
+                            ? Color.yellow
+                            : Color.orange
                     );
                 }
             }
         }));
-        statusLabel.setFont(statusLabel.getFont().deriveFont(20.0f));
-        guiPanel.add(statusLabel, JLabel.CENTER);
+        statusLabel.setFont(statusLabel.getFont().deriveFont(guiPanel.scale(20.0f)));
+        guiFrame.add(statusLabel, BorderLayout.NORTH);
+        guiFrame.pack();
         guiPanel.addDarkModeChangeListener(this::onDarkModeChange);
+        guiPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(final ComponentEvent e) {
+                statusLabel.setFont(
+                    statusLabel.getFont().deriveFont(
+                        Math.max(20f, 0.04f * Math.min(guiPanel.getWidth(), guiPanel.getHeight()))
+                    )
+                );
+            }
+        });
         // trigger dark mode change to set the correct color
         guiPanel.setDarkMode(World.getGlobalWorld().getGuiPanel().isDarkMode());
     }
 
+    /**
+     * Called when the dark mode changes.
+     *
+     * @param e the property change event
+     */
+    @SuppressWarnings("UnstableApiUsage")
     public void onDarkModeChange(final PropertyChangeEvent e) {
         final var darkMode = (boolean) e.getNewValue();
         statusLabel.setForeground(darkMode ? Color.white : Color.black);
+        World.getGlobalWorld().getGuiFrame().getContentPane().setBackground(darkMode ? Color.black : Color.white);
     }
 
     /**
@@ -112,12 +148,15 @@ public class InputHandler {
      */
     public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
         rowSelectMode.set(true);
-        statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
+        this.currentPlayer = currentPlayer;
+        if (!draw)
+            statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
         try {
             final int input = inputQueue.take();
-            System.out.println("Received input: " + input);
-            if (!fourWins.validateInput(input, stones)) {
-                System.out.println("Invalid input, please try again.");
+            System.out.println("Received column input: " + input);
+            if (checkForDraw(stones)) return getNextInput(currentPlayer, stones);
+            if (!FourWins.validateInput(input, stones)) {
+                System.out.println("Invalid column input, please try again.");
                 return getNextInput(currentPlayer, stones);
             }
             rowSelectMode.set(false);
@@ -126,5 +165,36 @@ public class InputHandler {
             rowSelectMode.set(false);
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean checkForDraw(final RobotFamily[][] stones) {
+        for (int x = 0; x < World.getWidth(); x++) {
+            if (FourWins.validateInput(x, stones)) {
+                return false;
+            }
+        }
+
+        System.out.println("No valid columns found. Hence, game ends with a draw.");
+
+        final var guiPanel = World.getGlobalWorld().getGuiPanel();
+        for (int x = 0; x < World.getWidth(); x++) {
+            setColumnColor(x, () -> guiPanel.isDarkMode() ? Color.yellow : Color.orange);
+        }
+
+        statusLabel.setText("<html>No valid columns found. <br>Hence, game ends with a draw.</html>");
+        draw = true;
+        return true;
+    }
+
+    /**
+     * Returns the {@link #statusLabel} of this {@link InputHandler}.
+     * <p>
+     * Use the {@link JLabel#getText()} method to get the current text of the label, and the
+     * {@link JLabel#setText(String)} method to update the text.
+     *
+     * @return the {@link #statusLabel} of this {@link InputHandler}
+     */
+    public JLabel getStatusLabel() {
+        return statusLabel;
     }
 }

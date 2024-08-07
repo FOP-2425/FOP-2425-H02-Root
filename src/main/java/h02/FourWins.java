@@ -21,7 +21,7 @@ public class FourWins {
     private boolean finished = false;
     private final int width, height;
 
-    FourWins(int width, int height) {
+    FourWins(final int width, final int height) {
         this.width = width;
         this.height = height;
     }
@@ -66,7 +66,7 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.4")
     public static void displayWinner(final RobotFamily winner) {
-        System.out.println("Player of color " + winner + " wins the game!");
+        System.out.println("Player " + winner + " wins the game!");
 
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
