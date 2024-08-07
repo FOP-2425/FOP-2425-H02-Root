@@ -8,6 +8,9 @@ import h02.template.InputHandler;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 
+import java.awt.Color;
+import java.util.Optional;
+
 /**
  * The {@link FourWins} class represents the main class of the FourWins game.
  */
@@ -65,12 +68,27 @@ public class FourWins {
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
-    public static void displayWinner(final RobotFamily winner) {
+    public void displayWinner(final RobotFamily winner) {
+        inputHandler.displayWinnerStatus(winner);
         System.out.println("Player " + winner + " wins the game!");
 
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
                 setFieldColor(x, y, winner);
+            }
+        }
+    }
+
+    /**
+     * Displays a draw message in the console and fills the whole field with a color indicating a draw.
+     */
+    public void displayDraw() {
+        inputHandler.displayDrawStatus();
+        System.out.println("No valid columns found. Hence, game ends with a draw.");
+
+        for (int x = 0; x < World.getWidth(); x++) {
+            for (int y = 0; y < World.getHeight(); y++) {
+                setFieldColorDraw(x, y);
             }
         }
     }
@@ -90,6 +108,30 @@ public class FourWins {
     }
 
     /**
+     * Returns the color to draw the winning line.
+     *
+     * @return The color to draw the winning line.
+     */
+    @DoNotTouch
+    @SuppressWarnings("UnstableApiUsage")
+    protected static Color getDrawColor() {
+        return Optional.ofNullable(World.getGlobalWorld().getGuiPanel())
+            .map(guiPanel -> guiPanel.isDarkMode() ? Color.yellow : Color.orange)
+            .orElse(Color.yellow);
+    }
+
+    /**
+     * Sets the background color of a field at the specified coordinates to the color used for drawing the winning line.
+     *
+     * @param x the x coordinate of the field
+     * @param y the y coordinate of the field
+     */
+    @DoNotTouch
+    public static void setFieldColorDraw(final int x, final int y) {
+        World.getGlobalWorld().setFieldColor(x, y, getDrawColor());
+    }
+
+    /**
      * Executes the main game loop, handling player turns, stone drops, and win condition checks.
      * This method initializes the game board as a 2D array of RobotFamily colors, representing
      * the slots that can be filled with players' stones. It starts with a predefined currentPlayer
@@ -102,7 +144,7 @@ public class FourWins {
     void gameLoop() {
         final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
         RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
-
+        boolean draw = false;
         finished = false;
         while (!finished) {
             // student implementation here:
@@ -113,11 +155,21 @@ public class FourWins {
 
             // student implementation here:
             dropStone(column, stones, currentPlayer);
-            finished = testWinConditions(stones, currentPlayer);
+            final boolean winning = testWinConditions(stones, currentPlayer);
+            if (winning) {
+                finished = true;
+                break;
+            }
+            draw = !emptySpotsAvailable(stones);
+            finished = draw;
         }
 
         // student implementation here:
-        displayWinner(currentPlayer);
+        if (draw) {
+            displayDraw();
+        } else {
+            displayWinner(currentPlayer);
+        }
     }
 
     /**
@@ -201,7 +253,9 @@ public class FourWins {
      */
     @StudentImplementationRequired("H2.2.3")
     public static boolean testWinConditions(final RobotFamily[][] stones, final RobotFamily currentPlayer) {
-        return testWinVertical(stones, currentPlayer) || testWinHorizontal(stones, currentPlayer) || testWinDiagonal(stones, currentPlayer);
+        return testWinVertical(stones, currentPlayer)
+            || testWinHorizontal(stones, currentPlayer)
+            || testWinDiagonal(stones, currentPlayer);
     }
 
     /**
@@ -287,6 +341,21 @@ public class FourWins {
             }
         }
 
+        return false;
+    }
+
+    /**
+     * Checks if there are any empty spots available on the game board.
+     *
+     * @param stones 2D array representing the game board, where each cell contains a RobotFamily
+     * @return true if there are any empty spots available on the game board; false otherwise.
+     */
+    public static boolean emptySpotsAvailable(final RobotFamily[][] stones) {
+        for (int x = 0; x < World.getWidth(); x++) {
+            if (FourWins.validateInput(x, stones)) {
+                return true;
+            }
+        }
         return false;
     }
 }
