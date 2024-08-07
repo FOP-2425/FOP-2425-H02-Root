@@ -135,9 +135,9 @@ public class Main {
         final RobotFamily[][] stones2 = {
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
             {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-            {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
+            {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-            {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
+            {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
         };
 
 
