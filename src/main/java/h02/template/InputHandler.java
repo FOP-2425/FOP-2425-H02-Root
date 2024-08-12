@@ -5,9 +5,8 @@ import fopbot.World;
 import h02.FourWins;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -15,6 +14,10 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 /**
  * The {@link InputHandler} handles the input of the users.
@@ -25,16 +28,20 @@ public class InputHandler {
      * The input queue.
      */
     private final BlockingDeque<Integer> inputQueue = new LinkedBlockingDeque<>();
+
     /**
      * The {@link FourWins} instance.
      */
     private final FourWins fourWins;
-    private RobotFamily currentPlayer;
-    private boolean justFinished = true;
-    private boolean draw = false;
 
+    /**
+     * Whether the row select mode is active.
+     */
     private final AtomicBoolean rowSelectMode = new AtomicBoolean(false);
 
+    /**
+     * The status label.
+     */
     private final JLabel statusLabel = new JLabel("", SwingConstants.CENTER);
 
     /**
@@ -44,9 +51,7 @@ public class InputHandler {
      */
     public InputHandler(final FourWins fourWins) {
         this.fourWins = fourWins;
-        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        statusLabel.setVerticalAlignment(SwingConstants.CENTER);
-        int padding = 4; // Padding in pixels
+        final int padding = 4; // Padding in pixels
         statusLabel.setBorder(new EmptyBorder(padding, padding, padding, padding));
     }
 
@@ -60,20 +65,18 @@ public class InputHandler {
         for (int i = 0; i < World.getHeight(); i++) {
             final int finalI = i;
             SwingUtilities.invokeLater(() -> World.getGlobalWorld().getField(column, finalI).setFieldColor(colorSupplier));
-//            World.getGlobalWorld().getField(column, i).setFieldColor(color);
         }
     }
 
+    /**
+     * Executes the given action only if the game is running.
+     *
+     * @param action the action to execute
+     */
     private void whenGameIsRunning(final Runnable action) {
-        if (fourWins.isFinished()) {
-            if (justFinished) {
-                statusLabel.setText(String.format("<html>Player %s wins the game!</html>", currentPlayer));
-                justFinished = false;
-            }
-            return;
+        if (!fourWins.isFinished()) {
+            action.run();
         }
-        if (draw) return;
-        action.run();
     }
 
     /**
@@ -83,7 +86,9 @@ public class InputHandler {
     public void install() {
         final var guiPanel = World.getGlobalWorld().getGuiPanel();
         final var guiFrame = World.getGlobalWorld().getGuiFrame();
-        World.getGlobalWorld().getInputHandler().addFieldClickListener(e -> whenGameIsRunning(() -> addInput(e.getField().getX())));
+        World.getGlobalWorld().getInputHandler().addFieldClickListener(
+            e -> whenGameIsRunning(() -> addInput(e.getField().getX()))
+        );
         World.getGlobalWorld().getInputHandler().addFieldHoverListener(e -> whenGameIsRunning(() -> {
             // deselect last hovered field, if any
             if (e.getPreviousField() != null) {
@@ -95,8 +100,8 @@ public class InputHandler {
                     setColumnColor(
                         e.getField().getX(),
                         () -> guiPanel.isDarkMode()
-                            ? Color.yellow
-                            : Color.orange
+                              ? Color.yellow
+                              : Color.orange
                     );
                 }
             }
@@ -132,7 +137,8 @@ public class InputHandler {
     }
 
     /**
-     * Adds an input to the input queue. When {@link #getNextInput(RobotFamily, RobotFamily[][])} is called, the program will wait until this method is called.
+     * Adds an input to the input queue. When {@link #getNextInput(RobotFamily, RobotFamily[][])} is called, the program
+     * will wait until this method is called.
      *
      * @param input the input to add
      */
@@ -141,20 +147,21 @@ public class InputHandler {
     }
 
     /**
-     * Returns the next input from the input queue. If the input is invalid, the user will be prompted to enter a new input.
-     * The program will halt until a valid input is entered.
+     * Returns the next input from the input queue. If the input is invalid, the user will be prompted to enter a new
+     * input. The program will halt until a valid input is entered.
      *
+     * @param currentPlayer the current player
+     * @param stones        the current state of the game board
      * @return the next input from the input queue
      */
     public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
         rowSelectMode.set(true);
-        this.currentPlayer = currentPlayer;
-        if (!draw)
-            statusLabel.setText("<html>Click on a column to insert a disc.<br>Current Player: " + currentPlayer.getName() + "</html>");
+        statusLabel.setText(
+            "<html>Click on a column to insert a disc.<br>Current Player: %s</html>".formatted(currentPlayer.getName())
+        );
         try {
             final int input = inputQueue.take();
             System.out.println("Received column input: " + input);
-            if (checkForDraw(stones)) return getNextInput(currentPlayer, stones);
             if (!FourWins.validateInput(input, stones)) {
                 System.out.println("Invalid column input, please try again.");
                 return getNextInput(currentPlayer, stones);
@@ -167,29 +174,26 @@ public class InputHandler {
         }
     }
 
-    private boolean checkForDraw(final RobotFamily[][] stones) {
-        for (int x = 0; x < World.getWidth(); x++) {
-            if (FourWins.validateInput(x, stones)) {
-                return false;
-            }
-        }
-
-        System.out.println("No valid columns found. Hence, game ends with a draw.");
-
-        final var guiPanel = World.getGlobalWorld().getGuiPanel();
-        for (int x = 0; x < World.getWidth(); x++) {
-            setColumnColor(x, () -> guiPanel.isDarkMode() ? Color.yellow : Color.orange);
-        }
-
+    /**
+     * Sets a status message, saying that the game has ended in a draw.
+     */
+    public void displayDrawStatus() {
         statusLabel.setText("<html>No valid columns found. <br>Hence, game ends with a draw.</html>");
-        draw = true;
-        return true;
+    }
+
+    /**
+     * Sets a status message, saying that the game has ended with a winner.
+     *
+     * @param winner the winner of the game
+     */
+    public void displayWinnerStatus(final RobotFamily winner) {
+        statusLabel.setText("<html>Player %s has won the game!</html>".formatted(winner.getName()));
     }
 
     /**
      * Returns the {@link #statusLabel} of this {@link InputHandler}.
-     * <p>
-     * Use the {@link JLabel#getText()} method to get the current text of the label, and the
+     *
+     * <p>Use the {@link JLabel#getText()} method to get the current text of the label, and the
      * {@link JLabel#setText(String)} method to update the text.
      *
      * @return the {@link #statusLabel} of this {@link InputHandler}

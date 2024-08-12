@@ -33,7 +33,8 @@ public class OneDimensionalArrayStuff {
     }
 
     /**
-     * Calculates the next Fibonacci number based on the given array and returns a new array with the next Fibonacci number appended at the end.
+     * Calculates the next Fibonacci number based on the given array and returns a new array with the next Fibonacci
+     * number appended at the end.
      *
      * @param array the input array containing the last two Fibonacci numbers up to the current point
      * @return a new array with the next Fibonacci number appended at the end
@@ -51,7 +52,9 @@ public class OneDimensionalArrayStuff {
      */
     @StudentImplementationRequired("H2.1.1")
     public static int fibonacci(final int n) {
-        if (n < 2) return n; // base case (n=0 or n=1)
+        if (n < 2) {
+            return n; // base case (n=0 or n=1)
+        }
         int[] array = {0, 1};
         for (int i = 2; i <= n; i++) {
             array = calculateNextFibonacci(array);
