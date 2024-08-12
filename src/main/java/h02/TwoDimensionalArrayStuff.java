@@ -82,7 +82,7 @@ public class TwoDimensionalArrayStuff {
             // collect to 2D array
             .toArray(String[][]::new);
         /// uncomment the following line to log processed input
-//        System.out.printf("Processed input: %s%n", Arrays.deepToString(processedInput));
+        // System.out.printf("Processed input: %s%n", Arrays.deepToString(processedInput));
         // call regular meanOccurrencesPerLine
         return meanOccurrencesPerLine(processedInput, query);
     }

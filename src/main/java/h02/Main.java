@@ -78,13 +78,13 @@ public class Main {
             "a b c d e f".split(" "),
             "a b c d e f".split(" "),
             "a b c d e f".split(" "),
-        };
+            };
         // predefined complex test
         final String[][] complexTest = new String[][]{
             "a a b b c c".split(" "),
             "a b c d e f".split(" "),
             "a a a b b b c c c".split(" "),
-        };
+            };
 
 
         // student implementation here:
@@ -104,8 +104,21 @@ public class Main {
         );
     }
 
+    /**
+     * Helper method for sanity checks for exercise H2.1.2.
+     *
+     * @param input   the input array
+     * @param query   the query string
+     * @param refOcc  the reference occurrences
+     * @param refMean the reference mean
+     */
     @SolutionOnly
-    public static void sanityChecksH212Helper(final String[][] input, final String query, final int[] refOcc, final float refMean) {
+    public static void sanityChecksH212Helper(
+        final String[][] input,
+        final String query,
+        final int[] refOcc,
+        final float refMean
+    ) {
         final int[] occ = TwoDimensionalArrayStuff.occurrences(input, query);
         testEquals(refOcc.length, occ.length);
         for (int i = 0; i < occ.length; i++) {
@@ -129,7 +142,7 @@ public class Main {
             {null, null, null, RobotFamily.SQUARE_RED},
             {null, null, null, RobotFamily.SQUARE_BLUE},
             {null, null, null, RobotFamily.SQUARE_RED},
-        };
+            };
 
         // predefined stones2 array
         final RobotFamily[][] stones2 = {
@@ -138,7 +151,7 @@ public class Main {
             {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
             {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-        };
+            };
 
 
         // student implementation here:

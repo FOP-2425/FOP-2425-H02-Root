@@ -28,13 +28,20 @@ public class InputHandler {
      * The input queue.
      */
     private final BlockingDeque<Integer> inputQueue = new LinkedBlockingDeque<>();
+
     /**
      * The {@link FourWins} instance.
      */
     private final FourWins fourWins;
 
+    /**
+     * Whether the row select mode is active.
+     */
     private final AtomicBoolean rowSelectMode = new AtomicBoolean(false);
 
+    /**
+     * The status label.
+     */
     private final JLabel statusLabel = new JLabel("", SwingConstants.CENTER);
 
     /**
@@ -61,6 +68,11 @@ public class InputHandler {
         }
     }
 
+    /**
+     * Executes the given action only if the game is running.
+     *
+     * @param action the action to execute
+     */
     private void whenGameIsRunning(final Runnable action) {
         if (!fourWins.isFinished()) {
             action.run();
@@ -135,9 +147,11 @@ public class InputHandler {
     }
 
     /**
-     * Returns the next input from the input queue. If the input is invalid, the user will be prompted to enter a new input.
-     * The program will halt until a valid input is entered.
+     * Returns the next input from the input queue. If the input is invalid, the user will be prompted to enter a new
+     * input. The program will halt until a valid input is entered.
      *
+     * @param currentPlayer the current player
+     * @param stones        the current state of the game board
      * @return the next input from the input queue
      */
     public int getNextInput(final RobotFamily currentPlayer, final RobotFamily[][] stones) {
