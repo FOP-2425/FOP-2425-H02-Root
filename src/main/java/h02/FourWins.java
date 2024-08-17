@@ -15,22 +15,19 @@ import java.util.Optional;
  */
 public class FourWins {
     private final InputHandler inputHandler = new InputHandler(this);
-
+    /**
+     * The width of the game board.
+     */
+    private final int width;
+    /**
+     * The height of the game board.
+     */
+    private final int height;
     /**
      * Indicates whether the game has finished.
      */
     @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
     private boolean finished = false;
-
-    /**
-     * The width of the game board.
-     */
-    private final int width;
-
-    /**
-     * The height of the game board.
-     */
-    private final int height;
 
     /**
      * Creates a new {@link FourWins} instance with the given width and height.
@@ -63,138 +60,18 @@ public class FourWins {
 
 
     /**
-     * Switches the player for each turn. If the current player is SQUARE_BLUE, SQUARE_RED is returned as the next
-     * player. If the current player is SQUARE_RED, SQUARE_BLUE is returned as the next player.
+     * Validates if a given column index is within the bounds of the game board and not fully occupied.
      *
-     * @param currentPlayer The player color of the current player.
-     * @return The player color of the next player.
+     * @param column The column index to validate.
+     * @param stones 2D array representing the game board, where each cell contains a RobotFamily color indicating the
+     *               player that has placed a stone in that position.
+     * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
      */
-    @StudentImplementationRequired("H2.2.4")
-    public static RobotFamily nextPlayer(final RobotFamily currentPlayer) {
-        return currentPlayer == RobotFamily.SQUARE_BLUE ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+    @StudentImplementationRequired("H2.2.1")
+    public static boolean validateInput(final int column, final RobotFamily[][] stones) {
+        return column >= 0 && column < World.getWidth() && stones[World.getHeight() - 1][column] == null;
     }
 
-
-    /**
-     * Displays a Message in the console and on the game board indicating the game is drawn.
-     */
-    @StudentImplementationRequired("H2.2.4")
-    public void writeDrawMessage() {
-        inputHandler.displayDrawStatus();
-
-        // student implementation here:
-        System.out.println("No valid columns found. Hence, game ends with a draw.");
-    }
-
-    /**
-     * Displays a Message in the console and on the game board indicating the game is won by a player.
-     *
-     * @param winner {@link RobotFamily} of the winning player
-     */
-    @StudentImplementationRequired("H2.2.4")
-    public void writeWinnerMessage(final RobotFamily winner) {
-        inputHandler.displayWinnerStatus(winner);
-
-        // student implementation here:
-        System.out.println("Player " + winner + " wins the game!");
-    }
-
-    /**
-     * Displays the winner of the game by printing the winning color in the console and filling the whole field with
-     * Robots of the winning color.
-     *
-     * @param winner The RobotFamily color of the winner.
-     */
-    @StudentImplementationRequired("H2.2.4")
-    public static void colorFieldBackground(final RobotFamily winner) {
-        for (int x = 0; x < World.getWidth(); x++) {
-            for (int y = 0; y < World.getHeight(); y++) {
-                setFieldColor(x, y, winner);
-            }
-        }
-    }
-
-
-    /**
-     * Executes the main game loop, handling player turns, stone drops, and win condition checks. Sets the background
-     * color of a field at the specified coordinates. The color is derived from the {@link RobotFamily} SQUARE_BLUE or
-     * SQUARE_RED.
-     *
-     * @param x     the x coordinate of the field
-     * @param y     the y coordinate of the field
-     * @param color the {@link RobotFamily} corresponding to the field color to set
-     */
-    @DoNotTouch
-    public static void setFieldColor(final int x, final int y, final RobotFamily color) {
-        World.getGlobalWorld().setFieldColor(x, y, color.getColor());
-    }
-
-
-    /**
-     * Returns the {@link RobotFamily} which represents a drawn game.
-     *
-     * @return the {@link RobotFamily} which represents a drawn game.
-     */
-    @DoNotTouch
-    @SuppressWarnings("UnstableApiUsage")
-    protected static RobotFamily getDrawnRobotFamily() {
-        return Optional.ofNullable(World.getGlobalWorld().getGuiPanel())
-            .filter(guiPanel -> !guiPanel.isDarkMode())
-            .map(guiPanel -> RobotFamily.SQUARE_ORANGE)
-            .orElse(RobotFamily.SQUARE_YELLOW);
-    }
-
-    /**
-     * Executes the main game loop, handling player turns, stone drops, and win condition checks. This method
-     * initializes the game board as a 2D array of RobotFamily colors, representing the slots that can be filled with
-     * players' stones. It starts with a predefined currentPlayer and continues in a loop until a win condition is met.
-     * Each iteration of the loop waits for player input to select a column to drop a stone into, switches the current
-     * player, drops the stone in the selected column, and checks for win conditions. If a win condition is met, the
-     * loop ends, and the winner is displayed.
-     */
-    @StudentImplementationRequired("H2.2.4")
-    void gameLoop() {
-        final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
-        RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
-
-        boolean draw = false;
-        finished = false;
-
-        while (!finished) {
-            // student implementation here:
-            currentPlayer = nextPlayer(currentPlayer);
-
-            // wait for click in column (DO NOT TOUCH)
-            finished = draw = isGameBoardFull(stones);
-            if (draw) {
-                break;
-            }
-            final int column = inputHandler.getNextInput(currentPlayer, stones);
-
-            // student implementation here:
-            dropStone(column, stones, currentPlayer);
-            finished = testWinConditions(stones, currentPlayer);
-        }
-
-        // displaying either draw or winner (DO NOT TOUCH)
-        if (draw) {
-            writeDrawMessage();
-            colorFieldBackground(getDrawnRobotFamily());
-        } else {
-            writeWinnerMessage(currentPlayer);
-            colorFieldBackground(currentPlayer);
-        }
-    }
-
-
-    /**
-     * Returns {@code true} when the game is finished, {@code false} otherwise.
-     *
-     * @return whether the game is finished.
-     */
-    public boolean isFinished() {
-        return finished;
-    }
 
     /**
      * Calculates the next unoccupied row index in the specified column. This row index is the next destination for a
@@ -247,18 +124,6 @@ public class FourWins {
         stones[row][column] = currentPlayer;
     }
 
-    /**
-     * Validates if a given column index is within the bounds of the game board and not fully occupied.
-     *
-     * @param column The column index to validate.
-     * @param stones 2D array representing the game board, where each cell contains a RobotFamily color indicating the
-     *               player that has placed a stone in that position.
-     * @return true if the column is within bounds and has at least one unoccupied cell; false otherwise.
-     */
-    @StudentImplementationRequired("H2.2.1")
-    public static boolean validateInput(final int column, final RobotFamily[][] stones) {
-        return column >= 0 && column < World.getWidth() && stones[World.getHeight() - 1][column] == null;
-    }
 
     /**
      * Checks if the current player has won by any condition. The conditions can be a horizontal, vertical, diagonal, or
@@ -346,11 +211,9 @@ public class FourWins {
 
                     // test for consecutive coins
                     int coinCount = 0; // start counting at 0
-                    while (
-                        pos[0] >= 0 && pos[0] < WIDTH
-                            && pos[1] >= 0 && pos[1] < HEIGHT
-                            && stones[pos[1]][pos[0]] == currentPlayer
-                    ) {
+                    while (pos[0] >= 0 && pos[0] < WIDTH
+                        && pos[1] >= 0 && pos[1] < HEIGHT
+                        && stones[pos[1]][pos[0]] == currentPlayer) {
                         coinCount++; // count every stone that has currentPlayer's color
                         if (coinCount >= MAX_STONES) {
                             return true;
@@ -365,6 +228,126 @@ public class FourWins {
         }
 
         return false;
+    }
+
+
+    /**
+     * Switches the player for each turn. If the current player is SQUARE_BLUE, SQUARE_RED is returned as the next
+     * player. If the current player is SQUARE_RED, SQUARE_BLUE is returned as the next player.
+     *
+     * @param currentPlayer The player color of the current player.
+     * @return The player color of the next player.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public static RobotFamily nextPlayer(final RobotFamily currentPlayer) {
+        return currentPlayer == RobotFamily.SQUARE_BLUE ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+    }
+
+    /**
+     * Displays a Message in the console and on the game board indicating the game is drawn.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public void writeDrawMessage() {
+        inputHandler.displayDrawStatus();
+
+        // student implementation here:
+        System.out.println("No valid columns found. Hence, game ends with a draw.");
+    }
+
+    /**
+     * Displays a Message in the console and on the game board indicating the game is won by a player.
+     *
+     * @param winner {@link RobotFamily} of the winning player
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public void writeWinnerMessage(final RobotFamily winner) {
+        inputHandler.displayWinnerStatus(winner);
+
+        // student implementation here:
+        System.out.println("Player " + winner + " wins the game!");
+    }
+
+    /**
+     * Displays the winner of the game by printing the winning color in the console and filling the whole field with
+     * Robots of the winning color.
+     *
+     * @param winner The RobotFamily color of the winner.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    public static void colorFieldBackground(final RobotFamily winner) {
+        for (int x = 0; x < World.getWidth(); x++) {
+            for (int y = 0; y < World.getHeight(); y++) {
+                setFieldColor(x, y, winner);
+            }
+        }
+    }
+
+    /**
+     * Executes the main game loop, handling player turns, stone drops, and win condition checks. This method
+     * initializes the game board as a 2D array of RobotFamily colors, representing the slots that can be filled with
+     * players' stones. It starts with a predefined currentPlayer and continues in a loop until a win condition is met.
+     * Each iteration of the loop waits for player input to select a column to drop a stone into, switches the current
+     * player, drops the stone in the selected column, and checks for win conditions. If a win condition is met, the
+     * loop ends, and the winner is displayed.
+     */
+    @StudentImplementationRequired("H2.2.4")
+    void gameLoop() {
+        final RobotFamily[][] stones = new RobotFamily[World.getHeight()][World.getWidth()];
+        RobotFamily currentPlayer = RobotFamily.SQUARE_BLUE;
+
+        boolean draw = false;
+        finished = false;
+
+        while (!finished) {
+            // student implementation here:
+            currentPlayer = nextPlayer(currentPlayer);
+
+            // wait for click in column (DO NOT TOUCH)
+            finished = draw = isGameBoardFull(stones);
+            if (draw) {
+                break;
+            }
+            final int column = inputHandler.getNextInput(currentPlayer, stones);
+
+            // student implementation here:
+            dropStone(column, stones, currentPlayer);
+            finished = testWinConditions(stones, currentPlayer);
+        }
+
+        // displaying either draw or winner (DO NOT TOUCH)
+        if (draw) {
+            writeDrawMessage();
+            colorFieldBackground(getDrawnRobotFamily());
+        } else {
+            writeWinnerMessage(currentPlayer);
+            colorFieldBackground(currentPlayer);
+        }
+    }
+
+
+    /**
+     * Executes the main game loop, handling player turns, stone drops, and win condition checks. Sets the background
+     * color of a field at the specified coordinates. The color is derived from the {@link RobotFamily} SQUARE_BLUE or
+     * SQUARE_RED.
+     *
+     * @param x     the x coordinate of the field
+     * @param y     the y coordinate of the field
+     * @param color the {@link RobotFamily} corresponding to the field color to set
+     */
+    @DoNotTouch
+    public static void setFieldColor(final int x, final int y, final RobotFamily color) {
+        World.getGlobalWorld().setFieldColor(x, y, color.getColor());
+    }
+
+    /**
+     * Returns the {@link RobotFamily} which represents a drawn game.
+     *
+     * @return the {@link RobotFamily} which represents a drawn game.
+     */
+    @DoNotTouch
+    @SuppressWarnings("UnstableApiUsage")
+    protected static RobotFamily getDrawnRobotFamily() {
+        return Optional.ofNullable(World.getGlobalWorld().getGuiPanel()).filter(guiPanel -> !guiPanel.isDarkMode()).map(guiPanel -> RobotFamily.SQUARE_ORANGE).orElse(RobotFamily.SQUARE_YELLOW);
     }
 
     /**
@@ -382,4 +365,14 @@ public class FourWins {
         }
         return true;
     }
+
+    /**
+     * Returns {@code true} when the game is finished, {@code false} otherwise.
+     *
+     * @return whether the game is finished.
+     */
+    public boolean isFinished() {
+        return finished;
+    }
+
 }
