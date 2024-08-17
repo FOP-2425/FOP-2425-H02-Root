@@ -81,6 +81,8 @@ public class FourWins {
     @StudentImplementationRequired("H2.2.4")
     public void writeDrawMessage() {
         inputHandler.displayDrawStatus();
+
+        // student implementation here:
         System.out.println("No valid columns found. Hence, game ends with a draw.");
     }
 
@@ -92,6 +94,8 @@ public class FourWins {
     @StudentImplementationRequired("H2.2.4")
     public void writeWinnerMessage(final RobotFamily winner) {
         inputHandler.displayWinnerStatus(winner);
+
+        // student implementation here:
         System.out.println("Player " + winner + " wins the game!");
     }
 
@@ -102,7 +106,7 @@ public class FourWins {
      * @param winner The RobotFamily color of the winner.
      */
     @StudentImplementationRequired("H2.2.4")
-    public void colorFieldBackground(final RobotFamily winner) {
+    public static void colorFieldBackground(final RobotFamily winner) {
         for (int x = 0; x < World.getWidth(); x++) {
             for (int y = 0; y < World.getHeight(); y++) {
                 setFieldColor(x, y, winner);

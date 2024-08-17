@@ -5,8 +5,9 @@ import fopbot.World;
 import h02.FourWins;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -14,10 +15,6 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 
 /**
  * The {@link InputHandler} handles the input of the users.
@@ -100,8 +97,8 @@ public class InputHandler {
                     setColumnColor(
                         e.getField().getX(),
                         () -> guiPanel.isDarkMode()
-                              ? Color.yellow
-                              : Color.orange
+                            ? Color.yellow
+                            : Color.orange
                     );
                 }
             }
