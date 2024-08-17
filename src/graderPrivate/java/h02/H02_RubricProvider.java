@@ -251,26 +251,19 @@ public class H02_RubricProvider implements RubricProvider {
                                 "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
                             ),
                             criterion(
-                                "Methode displayWinner: Die Ausgabe in die Konsole ist korrekt."
+                                "Methode colorFieldBackground: Das Spielfeld wird korrekt eingefärbt."
                             ),
                             criterion(
-                                "Methode displayWinner: Das Spielfeld wird korrekt eingefärbt."
+                                "Methoden writeDrawMessage, writeWinnerMessage: Die Ausgabe in die Konsole ist korrekt."
                             ),
                             criterion(
-                                "Methode displayWinner: Verbindliche Anforderung 'genau zwei verschachtelte Schleifen' wurde verletzt.",
-                                JUnitTestRef.ofMethod(
-                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
-                                ),
-                                -1
-                            ),
-                            criterion(
-                                "Methode gameLoop: nextPlayer und testWinConditions werden korrekt aufgerufen."
+                                "Methode gameLoop: nextPlayer wird mit korrektem Parameter aufgerufen."
                             ),
                             criterion(
                                 "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen."
                             ),
                             criterion(
-                                "Methode gameLoop: displayWinner wird mit korrekten Parametern aufgerufen."
+                                "Methode gameLoop: testWinConditions wird mit korrekten Parametern aufgerufen."
                             )
                         )
                         .build()
