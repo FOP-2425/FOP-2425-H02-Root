@@ -106,13 +106,25 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert korrekt mit einem leeren Array."
+                                "Methode occurrences: Die Methode funktioniert korrekt mit einem leeren Array.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesEmptyArray", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert mit einem Satz."
+                                "Methode occurrences: Die Methode funktioniert mit einem Satz.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesSingleSentence", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert mit mehreren Sätzen."
+                                "Methode occurrences: Die Methode funktioniert mit mehreren Sätzen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesMultipleSentences", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode mean: Methode funktioniert mit ganzzahligen Rechenwerten."
