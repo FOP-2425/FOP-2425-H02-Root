@@ -41,6 +41,18 @@ public class TwoDimensionalArrayStuffTest {
         testOccurrences(params);
     }
 
+    @ParameterizedTest
+    @JsonParameterSetTest("TwoDimensionalArrayStuffTestIntegerMean.json")
+    public void testMeanInteger(JsonParameterSet params) {
+        testMean(params);
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest("TwoDimensionalArrayStuffTestFloatMean.json")
+    public void testMeanFloat(JsonParameterSet params) {
+        testMean(params);
+    }
+
     private static void testOccurrences(JsonParameterSet params) {
         List<String> sentences = params.get("sentences");
         String[][] input = sentences.stream()
@@ -68,5 +80,22 @@ public class TwoDimensionalArrayStuffTest {
             assertEquals(expected[i], actual[i], context, result ->
                 "Array returned by method occurrences does not have correct value at index " + finalI);
         }
+    }
+
+    private static void testMean(JsonParameterSet params) {
+        List<Integer> inputList = params.get("input");
+        AtomicInteger counter = new AtomicInteger(0);
+        int[] input = new int[inputList.size()];
+        inputList.forEach(i -> input[counter.getAndIncrement()] = i);
+        Context context = contextBuilder()
+            .add("input", input)
+            .build();
+
+        float expected = params.getFloat("expected");
+        float actual = callObject(() -> TwoDimensionalArrayStuff.mean(input), context, result ->
+            "An exception occurred while invoking method mean");
+
+        // susceptible to rounding errors?
+        assertEquals(expected, actual, context, result -> "Value returned by method mean is incorrect");
     }
 }

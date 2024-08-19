@@ -127,10 +127,18 @@ public class H02_RubricProvider implements RubricProvider {
                                 )
                             ),
                             criterion(
-                                "Methode mean: Methode funktioniert mit ganzzahligen Rechenwerten."
+                                "Methode mean: Methode funktioniert mit ganzzahligen Rechenwerten.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testMeanInteger", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode mean: Die Methode funktioniert auch dann korrekt, wenn das Ergebnis eine fließkommazahl ist."
+                                "Methode mean: Die Methode funktioniert auch dann korrekt, wenn das Ergebnis eine fließkommazahl ist.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testMeanFloat", JsonParameterSet.class)
+                                )
                             )
                         )
                         .build()
