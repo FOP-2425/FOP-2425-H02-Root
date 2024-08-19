@@ -78,13 +78,13 @@ public class Main {
             "a b c d e f".split(" "),
             "a b c d e f".split(" "),
             "a b c d e f".split(" "),
-            };
+        };
         // predefined complex test
         final String[][] complexTest = new String[][]{
             "a a b b c c".split(" "),
             "a b c d e f".split(" "),
             "a a a b b b c c c".split(" "),
-            };
+        };
 
 
         // student implementation here:
@@ -142,7 +142,7 @@ public class Main {
             {null, null, null, RobotFamily.SQUARE_RED},
             {null, null, null, RobotFamily.SQUARE_BLUE},
             {null, null, null, RobotFamily.SQUARE_RED},
-            };
+        };
 
         // predefined stones2 array
         final RobotFamily[][] stones2 = {
@@ -151,7 +151,7 @@ public class Main {
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE},
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
             {RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_BLUE, RobotFamily.SQUARE_RED},
-            };
+        };
 
 
         // student implementation here:
@@ -211,8 +211,8 @@ public class Main {
         testEquals(RobotFamily.SQUARE_BLUE, nextPlayer2);
 
 
-        // H2.2.4 displayWinner
-        // H2.2.4 gameLoop
+        // H2.2.4 colorFieldBackground, writeDrawMessage, writeWinnerMessage, gameLoop
+        // Test by playing
     }
 
 }
