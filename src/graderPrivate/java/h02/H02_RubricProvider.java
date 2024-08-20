@@ -163,15 +163,24 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn ein freier Slot existiert.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowFreeSlot", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn KEIN freier Slot existiert.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowBlockedSlot", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode getDestinationRow: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowVAnforderung")
                                 ),
                                 -1
                             ),
