@@ -185,18 +185,30 @@ public class H02_RubricProvider implements RubricProvider {
                                 -1
                             ),
                             criterion(
-                                "Methode dropStone: Robot wird mit korrekten Parametern erstellt."
+                                "Methode dropStone: Robot wird mit korrekten Parametern erstellt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneRobotCorrect", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode dropStone: getDestinationRow wird korrekt aufgerufen."
+                                "Methode dropStone: getDestinationRow wird korrekt aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneCallsGetDestinationRow")
+                                )
                             ),
                             criterion(
-                                "Methode dropStone: Robot führt die korrekte Bewegung aus."
+                                "Methode dropStone: Robot führt die korrekte Bewegung aus.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneMovementCorrect", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode dropStone: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod("testDropStoneVAnforderung")
                                 ),
                                 -1
                             )
