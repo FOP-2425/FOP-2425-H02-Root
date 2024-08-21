@@ -12,16 +12,14 @@ import org.tudalgo.algoutils.tutor.general.assertions.Assertions2;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSetTest;
-import spoon.Launcher;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
-import spoon.reflect.declaration.CtType;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 
@@ -98,27 +96,19 @@ public class FourWinsTest {
 
     @Test
     public void testGetDestinationRowVAnforderung() {
-        CtType<?> ctType = SpoonUtils.getType(FourWins.class.getName());
-        CtMethod<?> getDestinationRowCtMethod = ctType.getMethodsByName("getDestinationRow")
-            .stream()
-            .filter(ctMethod -> {
-                List<CtParameter<?>> parameters = ctMethod.getParameters();
-                return parameters.size() == 2 &&
-                    parameters.get(0).getType().getQualifiedName().equals("int") &&
-                    parameters.get(1).getType().getQualifiedName().equals("fopbot.RobotFamily[][]");
-            })
-            .findAny()
-            .orElseThrow();
-        int loopStatements = 0;
-        Iterator<CtElement> statementIterator = getDestinationRowCtMethod.getBody().descendantIterator();
+        iterateMethodStatements("getDestinationRow",
+            new Class[] {int.class, RobotFamily[][].class},
+            iterator -> {
+                int loopStatements = 0;
 
-        while (statementIterator.hasNext()) {
-            CtElement ctElement = statementIterator.next();
-            if (ctElement instanceof CtFor || ctElement instanceof CtWhile || ctElement instanceof CtDo) {
-                loopStatements++;
-            }
-        }
-        assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
+                while (iterator.hasNext()) {
+                    CtElement ctElement = iterator.next();
+                    if (ctElement instanceof CtFor || ctElement instanceof CtWhile || ctElement instanceof CtDo) {
+                        loopStatements++;
+                    }
+                }
+                assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
+            });
     }
 
     private void testGetDestinationRow(JsonParameterSet params, boolean testFreeSlots) {
@@ -151,5 +141,24 @@ public class FourWinsTest {
             assertEquals(expected, actual, context, result ->
                 "Method getDestinationRow returned an incorrect value");
         }
+    }
+
+    private static void iterateMethodStatements(String methodName, Class<?>[] paramTypes, Consumer<Iterator<CtElement>> consumer) {
+        Iterator<CtElement> iterator = SpoonUtils.getType(FourWins.class.getName())
+            .getMethodsByName(methodName)
+            .stream()
+            .filter(ctMethod -> {
+                List<CtParameter<?>> parameters = ctMethod.getParameters();
+                boolean result = parameters.size() == paramTypes.length;
+                for (int i = 0; result && i < parameters.size(); i++) {
+                    result = parameters.get(i).getType().getQualifiedName().equals(paramTypes[i].getTypeName());
+                }
+                return result;
+            })
+            .findAny()
+            .orElseThrow()
+            .getBody()
+            .descendantIterator();
+        consumer.accept(iterator);
     }
 }
