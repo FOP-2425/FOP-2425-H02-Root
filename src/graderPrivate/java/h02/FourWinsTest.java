@@ -1,6 +1,7 @@
 package h02;
 
 import fopbot.RobotFamily;
+import fopbot.World;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
@@ -24,10 +25,22 @@ import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.context
 public class FourWinsTest {
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "generateFourWinsTest_validateInput.json")
+    @JsonParameterSetTest(value = "fourWinsTestValidateInput.json")
+    public void testValidateInputEdgeCases(final JsonParameterSet params) {
+        testValidateInput(params);
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest(value = "fourWinsTestValidateInputRandomCases.json")
+    public void testValidateInputRandomCases(final JsonParameterSet params) {
+        testValidateInput(params);
+    }
+
     public void testValidateInput(final JsonParameterSet params) {
         // get params
         final int paramColumn = params.getInt("column");
+        final int paramWidth = params.getInt("width");
+        final int paramHeight = params.getInt("height");
         final List<List<String>> paramStones = params.get("stones");
         final boolean expectedResult = params.getBoolean("expected result");
 
@@ -37,13 +50,20 @@ public class FourWinsTest {
             .add(ParamsContext)
             .add("Method", "validateInput");
 
+        // init the world size
+        World.setSize(paramWidth, paramHeight);
+
+
         // parse array and calculate result
         RobotFamily[][] paramStonesArray = paramStones.stream()
-            .map(
-                innerList -> innerList.stream().map(
-                    (str) -> str.equals("SQUARE_RED") ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE
-                ).toArray(RobotFamily[]::new)
-            ).toArray(RobotFamily[][]::new);
+            .map(innerList -> innerList.stream()
+                .map(str -> "EMPTY".equals(str) ? null : "SQUARE_RED".equals(str) ? RobotFamily.SQUARE_RED :
+                    RobotFamily.SQUARE_BLUE)
+                .toArray(RobotFamily[]::new))
+            .toArray(RobotFamily[][]::new);
+
+
+
         final boolean actualResult = Assertions2.callObject(
             () -> FourWins.validateInput(
                 paramColumn,
@@ -62,14 +82,4 @@ public class FourWinsTest {
         );
     }
 
-    @ParameterizedTest
-    @JsonParameterSetTest(value = "generateNoTest.json")
-    public void noTestYet(final JsonParameterSet params) {
-        Assertions2.assertEquals(
-            true,
-            false,
-            contextBuilder().build(),
-            r -> "Test not implemented yet."
-        );
-    }
 }

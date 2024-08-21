@@ -2,6 +2,7 @@ package h02;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fopbot.RobotFamily;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -107,6 +108,61 @@ public class TestJsonGenerators {
             },
             smallerThanTwo ? 2 : TEST_ITERATIONS,
             "OneDimensionalArrayStuffTestFibonacciRandomNumbers" + (smallerThanTwo ? "SmallerThanTwo" : "") + ".json"
+        );
+    }
+
+
+    @Test
+    public void generateValidateInputRandomCases() throws IOException {
+        TestUtils.generateJsonTestData(
+            (mapper, index, rnd) -> {
+                final ObjectNode objectNode = mapper.createObjectNode();
+
+                // Spielfeldgröße zufällig wählen
+                final int width = rnd.nextInt(3, 10); // Breite zwischen 3 und 10
+                final int height = rnd.nextInt(3, 10); // Höhe zwischen 3 und 10
+                objectNode.put("width", width);
+                objectNode.put("height", height);
+
+                // Zufälliges Spielfeld generieren
+                RobotFamily[][] stones = new RobotFamily[height][width];
+                for (int row = 0; row < height; row++) {
+                    for (int col = 0; col < width; col++) {
+                        if (rnd.nextBoolean()) {
+                            stones[row][col] = rnd.nextBoolean() ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+                        }
+                    }
+                }
+
+                // Spaltenindex zufällig wählen (auch ungültige Indizes)
+                final int column = rnd.nextInt(-1, width + 1);
+                objectNode.put("column", column);
+
+                // Erwartetes Ergebnis berechnen
+                boolean expectedResult = column >= 0 && column < width && stones[height - 1][column] == null;
+                objectNode.put("expected result", expectedResult);
+
+                // Spielfeld in JSON-Format umwandeln
+                ArrayNode stonesArray = mapper.createArrayNode();
+                for (int row = 0; row < height; row++) {
+                    ArrayNode rowArray = mapper.createArrayNode();
+                    for (int col = 0; col < width; col++) {
+                        if (stones[row][col] == null) {
+                            rowArray.add("EMPTY");
+                        } else if (stones[row][col] == RobotFamily.SQUARE_RED) {
+                            rowArray.add("SQUARE_RED");
+                        } else {
+                            rowArray.add("SQUARE_BLUE");
+                        }
+                    }
+                    stonesArray.add(rowArray);
+                }
+                objectNode.set("stones", stonesArray);
+
+                return objectNode;
+            },
+            TEST_ITERATIONS,
+            "fourWinsTestValidateInputRandomCases.json"
         );
     }
 }

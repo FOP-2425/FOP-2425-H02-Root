@@ -134,7 +134,17 @@ public class H02_RubricProvider implements RubricProvider {
                         .shortDescription("H2.2.1 | Slot Prüfen")
                         .addChildCriteria(
                             criterion(
-                                "Methode validateInput: Methode ist vollständig korrekt implementiert."
+                                "Methode validateInput: Methode ist vollständig korrekt implementiert.",
+                                JUnitTestRef.and(
+                                    JUnitTestRef.ofMethod(
+                                        () -> FourWinsTest.class.getDeclaredMethod(
+                                            "testValidateInputEdgeCases", JsonParameterSet.class)
+                                    ),
+                                    JUnitTestRef.ofMethod(
+                                        () -> FourWinsTest.class.getDeclaredMethod(
+                                            "testValidateInputRandomCases", JsonParameterSet.class)
+                                    )
+                                )
                             )
                         )
                         .build(),
