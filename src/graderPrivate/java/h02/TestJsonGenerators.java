@@ -1,5 +1,6 @@
 package h02;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fopbot.RobotFamily;
@@ -151,6 +152,61 @@ public class TestJsonGenerators {
             },
             TEST_ITERATIONS,
             "FourWinsTestGameBoard.json"
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void generateFourWinsTestGameBoardWin(boolean horizontal) throws IOException {
+        TestUtils.generateJsonTestData(
+            (mapper, index, rnd) -> {
+                int worldHeight = rnd.nextInt(5, 10);
+                int worldWidth = rnd.nextInt(5, 10);
+                RobotFamily currentPlayer = rnd.nextBoolean() ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+                ObjectNode objectNode = mapper.createObjectNode()
+                    .put("worldHeight", worldHeight)
+                    .put("worldWidth", worldWidth)
+                    .put("currentPlayer", currentPlayer.getName());
+
+                ArrayNode winningCoordinates = mapper.createArrayNode();
+                rnd.ints(rnd.nextInt(3), 0, horizontal ? worldHeight : worldWidth)
+                    .distinct()
+                    .forEach(i -> {
+                        if (horizontal) {
+                            winningCoordinates.add(mapper.createObjectNode()
+                                .put("x", rnd.nextInt(worldWidth - 4 + 1))
+                                .put("y", i));
+                        } else {
+                            winningCoordinates.add(mapper.createObjectNode()
+                                .put("x", i)
+                                .put("y", rnd.nextInt(worldHeight - 4 + 1)));
+                        }
+                    });
+                objectNode.set(horizontal ? "winningRowCoordinates" : "winningColCoordinates", winningCoordinates);
+
+                RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
+                for (JsonNode node : winningCoordinates) {
+                    for (int offset = 0; offset < 4; offset++) {
+                        if (horizontal) {
+                            gameBoard[node.get("y").intValue()][node.get("x").intValue() + offset] = currentPlayer;
+                        } else {
+                            gameBoard[node.get("y").intValue() + offset][node.get("x").intValue()] = currentPlayer;
+                        }
+                    }
+                }
+
+                ArrayNode gameBoardNode = mapper.createArrayNode();
+                Arrays.stream(gameBoard)
+                    .map(gameBoardRow -> Arrays.stream(gameBoardRow)
+                        .map(rf -> mapper.getNodeFactory().textNode(rf != null ? rf.getName() : null))
+                        .toList())
+                    .forEach(gameBoardRow -> gameBoardNode.add(mapper.createArrayNode().addAll(gameBoardRow)));
+                objectNode.set("gameBoard", gameBoardNode);
+
+                return objectNode;
+            },
+            TEST_ITERATIONS,
+            "FourWinsTestGameBoard" + (horizontal ? "Horizontal" : "Vertical") + "Win.json"
         );
     }
 }

@@ -221,25 +221,25 @@ public class H02_RubricProvider implements RubricProvider {
                                 .shortDescription("Methode testWinHorizontal: ")
                                 .addChildCriteria(
                                     criterion(
-                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
-                                        JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
-                                        ),
-                                        1
-                                    ),
-                                    criterion(
                                         "Methode erkennt richtige horizontale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinHorizontal", JsonParameterSet.class)
                                         ),
                                         2
                                     ),
                                     criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinHorizontalVAnforderung1")
+                                        ),
+                                        1
+                                    ),
+                                    criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
                                         JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                            () -> FourWinsTest.class.getDeclaredMethod("testTestWinHorizontalVAnforderung2")
                                         ),
                                         -2
                                     )
@@ -247,39 +247,47 @@ public class H02_RubricProvider implements RubricProvider {
                             Criterion.builder()
                                 .shortDescription("Methode testWinVertical: ")
                                 .addChildCriteria(
-                                    criterion(
-                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
-                                        JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
-                                        ),
-                                        1
-                                    ),
                                     criterion(
                                         "Methode erkennt richtige vertikale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinVertical", JsonParameterSet.class)
                                         ),
                                         2
+                                    ),
+                                    criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinVerticalVAnforderung1")
+                                        ),
+                                        1
                                     ),
                                     criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinVerticalVAnforderung2")
                                         ),
                                         -2
                                     )
                                 ).minPoints(0).build(),
                             Criterion.builder()
-                                .shortDescription("Methode testWinVertical: ")
+                                .shortDescription("Methode testWinConditions: ")
                                 .addChildCriteria(
                                     criterion(
-                                        "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen."
+                                        "Die Rückgabe ist in allen Fällen korrekt.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinConditions", int.class)
+                                        )
                                     ),
                                     criterion(
-                                        "Die Rückgabe ist in allen Fällen korrekt."
+                                        "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinConditionsVAnforderung")
+                                        )
                                     )
                                 ).build()
                         )

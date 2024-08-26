@@ -4,6 +4,10 @@ import fopbot.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
 import org.tudalgo.algoutils.tutor.general.SpoonUtils;
 import org.tudalgo.algoutils.tutor.general.annotation.SkipAfterFirstFailedTest;
@@ -19,8 +23,11 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -276,6 +283,218 @@ public class FourWinsTest {
                 }
                 assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
             });
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest("FourWinsTestGameBoardHorizontalWin.json")
+    public void testTestWinHorizontal(JsonParameterSet params) {
+        int worldHeight = params.getInt("worldHeight");
+        int worldWidth = params.getInt("worldWidth");
+        RobotFamily currentPlayer = robotFamilyLookup(params.getString("currentPlayer"));
+        List<Map<String, Integer>> winningRowCoordinates = params.get("winningRowCoordinates");
+        List<List<String>> paramStones = params.get("gameBoard");
+        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
+        for (int row = 0; row < worldHeight; row++) {
+            for (int col = 0; col < worldWidth; col++) {
+                gameBoard[row][col] = robotFamilyLookup(paramStones.get(row).get(col));
+            }
+        }
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones", gameBoard)
+            .add("currentPlayer", currentPlayer)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        boolean expected = !winningRowCoordinates.isEmpty();
+        boolean actual = callObject(() -> FourWins.testWinHorizontal(gameBoard, currentPlayer), context, result ->
+            "An exception occurred while invoking method testWinHorizontal");
+        assertEquals(expected, actual, context, result ->
+            "Method testWinHorizontal did not return the correct value");
+    }
+
+    @Test
+    public void testTestWinHorizontalVAnforderung1() {
+        iterateMethodStatements("testWinHorizontal", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
+            List<CtLoop> loops = new ArrayList<>();
+
+            while (iterator.hasNext()) {
+                if (iterator.next() instanceof CtLoop ctLoop) {
+                    loops.add(ctLoop);
+                }
+            }
+
+            assertEquals(2, loops.size(), emptyContext(), result ->
+                "Method testWinHorizontal does not use exactly two loops");
+            assertTrue(loops.get(0).getBody().equals(loops.get(1).getParent()), emptyContext(), result ->
+                "Method testWinHorizontal does not use exactly two nested loops");
+        });
+    }
+
+    @Test
+    public void testTestWinHorizontalVAnforderung2() {
+        int worldHeight = 5;
+        int worldWidth = 5;
+        RobotFamily[][] stones = new RobotFamily[worldHeight][worldWidth];
+        for (int row = 0; row < 4; row++) {
+            stones[row][0] = RobotFamily.SQUARE_RED;
+        }
+        RobotFamily currentPlayer = RobotFamily.SQUARE_RED;
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones", stones)
+            .add("currentPlayer", currentPlayer)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        assertCallFalse(() -> FourWins.testWinHorizontal(stones, currentPlayer), context, result ->
+            "Method testWinHorizontal returned an incorrect value");
+    }
+
+    @ParameterizedTest
+    @JsonParameterSetTest("FourWinsTestGameBoardVerticalWin.json")
+    public void testTestWinVertical(JsonParameterSet params) {
+        int worldHeight = params.getInt("worldHeight");
+        int worldWidth = params.getInt("worldWidth");
+        RobotFamily currentPlayer = robotFamilyLookup(params.getString("currentPlayer"));
+        List<Map<String, Integer>> winningColCoordinates = params.get("winningColCoordinates");
+        List<List<String>> paramStones = params.get("gameBoard");
+        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
+        for (int row = 0; row < worldHeight; row++) {
+            for (int col = 0; col < worldWidth; col++) {
+                gameBoard[row][col] = robotFamilyLookup(paramStones.get(row).get(col));
+            }
+        }
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones", gameBoard)
+            .add("currentPlayer", currentPlayer)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        boolean expected = !winningColCoordinates.isEmpty();
+        boolean actual = callObject(() -> FourWins.testWinVertical(gameBoard, currentPlayer), context, result ->
+            "An exception occurred while invoking method testWinVertical");
+        assertEquals(expected, actual, context, result ->
+            "Method testWinVertical did not return the correct value");
+    }
+
+    @Test
+    public void testTestWinVerticalVAnforderung1() {
+        iterateMethodStatements("testWinVertical", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
+            List<CtLoop> loops = new ArrayList<>();
+
+            while (iterator.hasNext()) {
+                if (iterator.next() instanceof CtLoop ctLoop) {
+                    loops.add(ctLoop);
+                }
+            }
+
+            assertEquals(2, loops.size(), emptyContext(), result ->
+                "Method testWinVertical does not use exactly two loops");
+            assertTrue(loops.get(0).getBody().equals(loops.get(1).getParent()), emptyContext(), result ->
+                "Method testWinVertical does not use exactly two nested loops");
+        });
+    }
+
+    @Test
+    public void testTestWinVerticalVAnforderung2() {
+        int worldHeight = 5;
+        int worldWidth = 5;
+        RobotFamily[][] stones = new RobotFamily[worldHeight][worldWidth];
+        for (int col = 0; col < 4; col++) {
+            stones[0][col] = RobotFamily.SQUARE_RED;
+        }
+        RobotFamily currentPlayer = RobotFamily.SQUARE_RED;
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones", stones)
+            .add("currentPlayer", currentPlayer)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        assertCallFalse(() -> FourWins.testWinVertical(stones, currentPlayer), context, result ->
+            "Method testWinVertical returned an incorrect value");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
+    public void testTestWinConditions(int flags) throws ReflectiveOperationException {
+        // testWinHorizontal = LSB, testWinVertical = LSB + 1, testWinDiagonal = LSB + 2
+        Method testWinHorizontalMethod = FourWins.class.getDeclaredMethod("testWinHorizontal", RobotFamily[][].class, RobotFamily.class);
+        Method testWinVerticalMethod = FourWins.class.getDeclaredMethod("testWinVertical", RobotFamily[][].class, RobotFamily.class);
+        Method testWinDiagonalMethod = FourWins.class.getDeclaredMethod("testWinDiagonal", RobotFamily[][].class, RobotFamily.class);
+        Answer<?> answer = invocation -> {
+            if (invocation.getMethod().equals(testWinHorizontalMethod)) {
+                return (flags & 1) == 1;
+            } else if (invocation.getMethod().equals(testWinVerticalMethod)) {
+                return (flags >> 1 & 1) == 1;
+            } else if (invocation.getMethod().equals(testWinDiagonalMethod)) {
+                return (flags >> 2 & 1) == 1;
+            } else {
+                return invocation.callRealMethod();
+            }
+        };
+        int worldHeight = 5;
+        int worldWidth = 5;
+        RobotFamily[][] stones = new RobotFamily[worldHeight][worldWidth];
+        RobotFamily currentPlayer = RobotFamily.SQUARE_RED;
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones (ignored)", stones)
+            .add("currentPlayer (ignored)", currentPlayer.getName())
+            .add("testWinHorizontal (mocked) return value", (flags & 1) == 1)
+            .add("testWinVertical (mocked) return value", (flags >> 1 & 1) == 1)
+            .add("testWinDiagonal (mocked) return value", (flags >> 2 & 1) == 1)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        try (MockedStatic<FourWins> mock = Mockito.mockStatic(FourWins.class, answer)) {
+            assertCallEquals(flags != 0, () -> FourWins.testWinConditions(stones, currentPlayer), context, result ->
+                "Method testWinConditions did not return the correct value");
+        }
+    }
+
+    @Test
+    public void testTestWinConditionsVAnforderung() {
+        iterateMethodStatements("testWinConditions", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
+            boolean callsTestWinHorizontal = false;
+            boolean callsTestWinVertical = false;
+            boolean callsTestWinDiagonal = false;
+
+            while (iterator.hasNext()) {
+                if (iterator.next() instanceof CtInvocation<?> ctInvocation) {
+                    if (ctInvocation.getExecutable().getSimpleName().equals("testWinHorizontal")) {
+                        callsTestWinHorizontal = true;
+                    } else if (ctInvocation.getExecutable().getSimpleName().equals("testWinVertical")) {
+                        callsTestWinVertical = true;
+                    } else if (ctInvocation.getExecutable().getSimpleName().equals("testWinDiagonal")) {
+                        callsTestWinDiagonal = true;
+                    }
+                }
+            }
+
+            assertTrue(callsTestWinHorizontal, emptyContext(), result -> "Method testWinConditions did not call testWinHorizontal");
+            assertTrue(callsTestWinVertical, emptyContext(), result -> "Method testWinConditions did not call testWinVertical");
+            assertTrue(callsTestWinDiagonal, emptyContext(), result -> "Method testWinConditions did not call testWinDiagonal");
+        });
+    }
+
+    private static RobotFamily robotFamilyLookup(String robotFamilyName) {
+        if (robotFamilyName == null) {
+            return null;
+        }
+
+        return switch (robotFamilyName) {
+            case "SQUARE_RED" -> RobotFamily.SQUARE_RED;
+            case "SQUARE_BLUE" -> RobotFamily.SQUARE_BLUE;
+            default -> null;
+        };
     }
 
     private void testGetDestinationRow(JsonParameterSet params, boolean testFreeSlots) {
