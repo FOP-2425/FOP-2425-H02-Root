@@ -42,6 +42,46 @@ import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
 @SkipAfterFirstFailedTest(TestConstants.SKIP_AFTER_FIRST_FAILED_TEST)
 public class FourWinsTest {
 
+    private static final Consumer<Iterator<CtElement>> SINGLE_LOOP_VA = iterator -> {
+        int loopStatements = 0;
+
+        while (iterator.hasNext()) {
+            if (iterator.next() instanceof CtLoop) {
+                loopStatements++;
+            }
+        }
+        assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
+    };
+
+    private int worldHeight;
+    private int worldWidth;
+    private RobotFamily[][] stones;
+    private RobotFamily currentPlayer;
+    private Context.Builder<?> baseContextBuilder;
+
+    public void setup(JsonParameterSet params) {
+        worldHeight = params.getInt("worldHeight");
+        worldWidth = params.getInt("worldWidth");
+        List<List<String>> paramStones = params.get("gameBoard");
+        stones = new RobotFamily[worldHeight][worldWidth];
+        for (int row = 0; row < worldHeight; row++) {
+            for (int col = 0; col < worldWidth; col++) {
+                stones[row][col] = robotFamilyLookup(paramStones.get(row).get(col));
+            }
+        }
+        baseContextBuilder = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("stones", stones);
+        if (params.availableKeys().contains("currentPlayer")) {
+            currentPlayer = robotFamilyLookup(params.get("currentPlayer"));
+            baseContextBuilder.add("currentPlayer", currentPlayer);
+        }
+
+        World.setSize(worldWidth, worldHeight);
+        World.setDelay(0);
+    }
+
     @ParameterizedTest
     @JsonParameterSetTest(value = "generateFourWinsTest_validateInput.json")
     public void testValidateInput(final JsonParameterSet params) {
@@ -82,17 +122,6 @@ public class FourWinsTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "generateNoTest.json")
-    public void noTestYet(final JsonParameterSet params) {
-        Assertions2.assertEquals(
-            true,
-            false,
-            contextBuilder().build(),
-            r -> "Test not implemented yet."
-        );
-    }
-
-    @ParameterizedTest
     @JsonParameterSetTest("FourWinsTestGameBoard.json")
     public void testGetDestinationRowFreeSlot(JsonParameterSet params) {
         testGetDestinationRow(params, true);
@@ -108,35 +137,15 @@ public class FourWinsTest {
     public void testGetDestinationRowVAnforderung() {
         iterateMethodStatements("getDestinationRow",
             new Class[] {int.class, RobotFamily[][].class},
-            iterator -> {
-                int loopStatements = 0;
-
-                while (iterator.hasNext()) {
-                    CtElement ctElement = iterator.next();
-                    if (ctElement instanceof CtFor || ctElement instanceof CtWhile || ctElement instanceof CtDo) {
-                        loopStatements++;
-                    }
-                }
-                assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
-            });
+            SINGLE_LOOP_VA);
     }
 
     @ParameterizedTest
     @JsonParameterSetTest("FourWinsTestGameBoard.json")
     public void testDropStoneRobotCorrect(JsonParameterSet params) {
-        int worldHeight = params.getInt("worldHeight");
-        int worldWidth = params.getInt("worldWidth");
+        setup(params);
         List<Integer> firstFreeIndex = params.get("firstFreeIndex");
-        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
-        List<List<String>> paramStones = params.get("gameBoard");
-        for (int row = 0; row < worldHeight; row++) {
-            for (int col = 0; col < worldWidth; col++) {
-                gameBoard[row][col] = paramStones.get(row).get(col) != null ? RobotFamily.SQUARE_RED : null;
-            }
-        }
 
-        World.setSize(worldWidth, worldHeight);
-        World.setDelay(0);
         for (int col = 0; col < worldWidth; col++) {
             if (firstFreeIndex.get(col) >= worldHeight) {
                 continue;
@@ -144,17 +153,14 @@ public class FourWinsTest {
 
             World.getGlobalWorld().reset();  // clear entities
             RobotFamily currentPlayer = col % 2 == 0 ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
-            Context context = contextBuilder()
-                .add("world height", worldHeight)
-                .add("world width", worldWidth)
+            Context context = baseContextBuilder
                 .add("column", col)
-                .add("stones", gameBoard)
                 .add("currentPlayer", currentPlayer)
                 .build();
 
             try {
                 final int finalCol = col;
-                call(() -> FourWins.dropStone(finalCol, gameBoard, currentPlayer), context, result ->
+                call(() -> FourWins.dropStone(finalCol, stones, currentPlayer), context, result ->
                     "An exception occurred while invoking method dropStone. Result may be salvageable, continuing...");
             } catch (Throwable t) {
                 t.printStackTrace(System.err);
@@ -205,19 +211,9 @@ public class FourWinsTest {
     @ParameterizedTest
     @JsonParameterSetTest("FourWinsTestGameBoard.json")
     public void testDropStoneMovementCorrect(JsonParameterSet params) {
-        int worldHeight = params.getInt("worldHeight");
-        int worldWidth = params.getInt("worldWidth");
+        setup(params);
         List<Integer> firstFreeIndex = params.get("firstFreeIndex");
-        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
-        List<List<String>> paramStones = params.get("gameBoard");
-        for (int row = 0; row < worldHeight; row++) {
-            for (int col = 0; col < worldWidth; col++) {
-                gameBoard[row][col] = paramStones.get(row).get(col) != null ? RobotFamily.SQUARE_RED : null;
-            }
-        }
 
-        World.setSize(worldWidth, worldHeight);
-        World.setDelay(0);
         for (int col = 0; col < worldWidth; col++) {
             if (firstFreeIndex.get(col) >= worldHeight) {
                 continue;
@@ -225,17 +221,14 @@ public class FourWinsTest {
 
             World.getGlobalWorld().reset();  // clear entities
             RobotFamily currentPlayer = RobotFamily.SQUARE_RED;
-            Context context = contextBuilder()
-                .add("world height", worldHeight)
-                .add("world width", worldWidth)
+            Context context = baseContextBuilder
                 .add("column", col)
-                .add("stones", gameBoard)
                 .add("currentPlayer", currentPlayer)
                 .build();
 
             try {
                 final int finalCol = col;
-                call(() -> FourWins.dropStone(finalCol, gameBoard, currentPlayer), context, result ->
+                call(() -> FourWins.dropStone(finalCol, stones, currentPlayer), context, result ->
                     "An exception occurred while invoking method dropStone. Result may be salvageable, continuing...");
             } catch (Throwable t) {
                 t.printStackTrace(System.err);
@@ -272,43 +265,17 @@ public class FourWinsTest {
     public void testDropStoneVAnforderung() {
         iterateMethodStatements("dropStone",
             new Class[] {int.class, RobotFamily[][].class, RobotFamily.class},
-            iterator -> {
-                int loopStatements = 0;
-
-                while (iterator.hasNext()) {
-                    CtElement ctElement = iterator.next();
-                    if (ctElement instanceof CtFor || ctElement instanceof CtWhile || ctElement instanceof CtDo) {
-                        loopStatements++;
-                    }
-                }
-                assertEquals(1, loopStatements, emptyContext(), result -> "Method does not use exactly one loop");
-            });
+            SINGLE_LOOP_VA);
     }
 
     @ParameterizedTest
     @JsonParameterSetTest("FourWinsTestGameBoardHorizontalWin.json")
     public void testTestWinHorizontal(JsonParameterSet params) {
-        int worldHeight = params.getInt("worldHeight");
-        int worldWidth = params.getInt("worldWidth");
-        RobotFamily currentPlayer = robotFamilyLookup(params.getString("currentPlayer"));
+        setup(params);
         List<Map<String, Integer>> winningRowCoordinates = params.get("winningRowCoordinates");
-        List<List<String>> paramStones = params.get("gameBoard");
-        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
-        for (int row = 0; row < worldHeight; row++) {
-            for (int col = 0; col < worldWidth; col++) {
-                gameBoard[row][col] = robotFamilyLookup(paramStones.get(row).get(col));
-            }
-        }
-        Context context = contextBuilder()
-            .add("world height", worldHeight)
-            .add("world width", worldWidth)
-            .add("stones", gameBoard)
-            .add("currentPlayer", currentPlayer)
-            .build();
-
-        World.setSize(worldWidth, worldHeight);
+        Context context = baseContextBuilder.build();
         boolean expected = !winningRowCoordinates.isEmpty();
-        boolean actual = callObject(() -> FourWins.testWinHorizontal(gameBoard, currentPlayer), context, result ->
+        boolean actual = callObject(() -> FourWins.testWinHorizontal(stones, currentPlayer), context, result ->
             "An exception occurred while invoking method testWinHorizontal");
         assertEquals(expected, actual, context, result ->
             "Method testWinHorizontal did not return the correct value");
@@ -356,27 +323,12 @@ public class FourWinsTest {
     @ParameterizedTest
     @JsonParameterSetTest("FourWinsTestGameBoardVerticalWin.json")
     public void testTestWinVertical(JsonParameterSet params) {
-        int worldHeight = params.getInt("worldHeight");
-        int worldWidth = params.getInt("worldWidth");
-        RobotFamily currentPlayer = robotFamilyLookup(params.getString("currentPlayer"));
+        setup(params);
         List<Map<String, Integer>> winningColCoordinates = params.get("winningColCoordinates");
-        List<List<String>> paramStones = params.get("gameBoard");
-        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
-        for (int row = 0; row < worldHeight; row++) {
-            for (int col = 0; col < worldWidth; col++) {
-                gameBoard[row][col] = robotFamilyLookup(paramStones.get(row).get(col));
-            }
-        }
-        Context context = contextBuilder()
-            .add("world height", worldHeight)
-            .add("world width", worldWidth)
-            .add("stones", gameBoard)
-            .add("currentPlayer", currentPlayer)
-            .build();
+        Context context = baseContextBuilder.build();
 
-        World.setSize(worldWidth, worldHeight);
         boolean expected = !winningColCoordinates.isEmpty();
-        boolean actual = callObject(() -> FourWins.testWinVertical(gameBoard, currentPlayer), context, result ->
+        boolean actual = callObject(() -> FourWins.testWinVertical(stones, currentPlayer), context, result ->
             "An exception occurred while invoking method testWinVertical");
         assertEquals(expected, actual, context, result ->
             "Method testWinVertical did not return the correct value");
@@ -498,18 +450,9 @@ public class FourWinsTest {
     }
 
     private void testGetDestinationRow(JsonParameterSet params, boolean testFreeSlots) {
-        int worldHeight = params.getInt("worldHeight");
-        int worldWidth = params.getInt("worldWidth");
+        setup(params);
         List<Integer> firstFreeIndex = params.get("firstFreeIndex");
-        RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
-        List<List<String>> paramStones = params.get("gameBoard");
-        for (int row = 0; row < worldHeight; row++) {
-            for (int col = 0; col < worldWidth; col++) {
-                gameBoard[row][col] = paramStones.get(row).get(col) != null ? RobotFamily.SQUARE_RED : null;
-            }
-        }
 
-        World.setSize(worldWidth, worldHeight);
         for (int i = 0; i < firstFreeIndex.size(); i++) {
             int index = firstFreeIndex.get(i);
             if ((testFreeSlots && index >= worldHeight) || (!testFreeSlots && index < worldHeight)) {
@@ -518,11 +461,10 @@ public class FourWinsTest {
 
             final int column = i;
             int expected = testFreeSlots ? index : -1;
-            Context context = contextBuilder()
+            Context context = baseContextBuilder
                 .add("column", column)
-                .add("stones", gameBoard)
                 .build();
-            int actual = callObject(() -> FourWins.getDestinationRow(column, gameBoard), context, result ->
+            int actual = callObject(() -> FourWins.getDestinationRow(column, stones), context, result ->
                 "An exception occurred while invoking method getDestinationRow");
             assertEquals(expected, actual, context, result ->
                 "Method getDestinationRow returned an incorrect value");
