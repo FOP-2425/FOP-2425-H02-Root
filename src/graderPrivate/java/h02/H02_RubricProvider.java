@@ -297,22 +297,46 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
+                                "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testNextPlayer", boolean.class)
+                                )
                             ),
                             criterion(
-                                "Methode colorFieldBackground: Das Spielfeld wird korrekt eingefärbt."
+                                "Methode colorFieldBackground: Das Spielfeld wird korrekt eingefärbt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testColorFieldBackground", boolean.class)
+                                )
                             ),
                             criterion(
-                                "Methoden writeDrawMessage, writeWinnerMessage: Die Ausgabe in die Konsole ist korrekt."
+                                "Methoden writeDrawMessage, writeWinnerMessage: Die Ausgabe in die Konsole ist korrekt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testWriteMessages")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: nextPlayer wird mit korrektem Parameter aufgerufen."
+                                "Methode gameLoop: nextPlayer wird mit korrektem Parameter aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsNextPlayer")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen."
+                                "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsDropStone")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: testWinConditions wird mit korrekten Parametern aufgerufen."
+                                "Methode gameLoop: testWinConditions wird mit korrekten Parametern aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsGetWinConditions")
+                                )
                             )
                         )
                         .build()

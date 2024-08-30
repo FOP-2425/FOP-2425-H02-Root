@@ -1,6 +1,7 @@
 package h02;
 
 import fopbot.*;
+import h02.template.InputHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,11 +24,10 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -437,16 +437,254 @@ public class FourWinsTest {
         });
     }
 
-    private static RobotFamily robotFamilyLookup(String robotFamilyName) {
-        if (robotFamilyName == null) {
-            return null;
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void testNextPlayer(boolean isRedPlayer) {
+        RobotFamily currentPlayer = isRedPlayer ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+        Context context = contextBuilder()
+            .add("currentPlayer", currentPlayer)
+            .build();
+
+        RobotFamily expected = isRedPlayer ? RobotFamily.SQUARE_BLUE : RobotFamily.SQUARE_RED;
+        assertCallEquals(expected, () -> FourWins.nextPlayer(currentPlayer), context, result ->
+            "Method nextPlayer did not return the correct value");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void testColorFieldBackground(boolean isRedPlayer) {
+        int worldHeight = 5;
+        int worldWidth = 5;
+        RobotFamily winner = isRedPlayer ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+        Context context = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth)
+            .add("winner", winner)
+            .build();
+
+        World.setSize(worldWidth, worldHeight);
+        World.setDelay(0);
+        call(() -> FourWins.colorFieldBackground(winner), context, result ->
+            "An exception occurred while invoking colorFieldBackground");
+        for (int row = 0; row < worldHeight; row++) {
+            for (int col = 0; col < worldWidth; col++) {
+                int finalRow = row;
+                int finalCol = col;
+                assertEquals(winner.getColor(), World.getGlobalWorld().getFieldColor(col, row), context, result ->
+                    "Color of field at row %d, column %d is incorrect".formatted(finalRow, finalCol));
+            }
+        }
+    }
+
+    @Test
+    public void testWriteMessages() {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream, true);
+        System.setOut(printStream);
+
+        int worldHeight = 5;
+        int worldWidth = 5;
+        FourWins fourWinsInstance = new FourWins(worldWidth, worldHeight);
+        Context.Builder<?> contextBuilder = contextBuilder()
+            .add("world height", worldHeight)
+            .add("world width", worldWidth);
+
+        World.setSize(worldWidth, worldHeight);
+        try {
+            contextBuilder.add("method", "writeDrawMessage");
+            fourWinsInstance.writeDrawMessage();
+            assertEquals(
+                "No valid columns found. Hence, game ends with a draw.",
+                outputStream.toString().strip(),
+                contextBuilder.build(),
+                result -> "Method did not print the correct string"
+            );
+
+            contextBuilder.add("method", "writeWinnerMessage");
+            for (RobotFamily winner : new RobotFamily[] {RobotFamily.SQUARE_RED, RobotFamily.SQUARE_BLUE}) {
+                contextBuilder.add("winner", winner);
+                outputStream.reset();
+                fourWinsInstance.writeWinnerMessage(winner);
+                assertEquals(
+                    "Player %s wins the game!".formatted(winner),
+                    outputStream.toString().strip(),
+                    contextBuilder.build(),
+                    result -> "Method did not print the correct string"
+                );
+            }
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    public void testGameLoopCallsNextPlayer() {
+        List<RobotFamily> nextPlayerArgs = new ArrayList<>();
+        Answer<?> answer = invocation -> {
+            Method method = invocation.getMethod();
+            if (method.getName().equals("nextPlayer") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily.class})) {
+                RobotFamily currentPlayer = invocation.getArgument(0);
+                nextPlayerArgs.add(currentPlayer);
+                return currentPlayer == RobotFamily.SQUARE_RED ? RobotFamily.SQUARE_BLUE : RobotFamily.SQUARE_RED;
+            } else if (method.getName().equals("dropStone") && Arrays.equals(method.getParameterTypes(), new Class[] {int.class, RobotFamily[][].class, RobotFamily.class})) {
+                return null;
+            } else if (method.getName().equals("testWinConditions") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily[][].class, RobotFamily.class})) {
+                return nextPlayerArgs.size() >= 5;
+            } else {
+                return invocation.callRealMethod();
+            }
+        };
+        try (MockedStatic<FourWins> mockedStatic = Mockito.mockStatic(FourWins.class, answer)) {
+            int worldHeight = 5;
+            int worldWidth = 5;
+            FourWins fourWins = new FourWins(worldWidth, worldHeight);
+            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
+            inputHandlerField.setAccessible(true);
+            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            for (int i = 0; i < 10; i++) {
+                inputHandler.addInput(0);
+            }
+
+            fourWins.startGame();
+            for (int i = 0; i < nextPlayerArgs.size(); i++) {
+                Context context = contextBuilder()
+                    .add("world height", worldHeight)
+                    .add("world width", worldWidth)
+                    .add("game loop iteration", i + 1)
+                    .build();
+
+                if (i % 2 == 0) {
+                    assertEquals(RobotFamily.SQUARE_BLUE, nextPlayerArgs.get(i), context, result ->
+                        "Method nextPlayer was not called with correct parameters");
+                } else {
+                    assertEquals(RobotFamily.SQUARE_RED, nextPlayerArgs.get(i), context, result ->
+                        "Method nextPlayer was not called with correct parameters");
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testGameLoopCallsDropStone() {
+        List<Integer> columnArgs = new ArrayList<>();
+        List<RobotFamily[][]> stonesArgs = new ArrayList<>();
+        List<RobotFamily> currentPlayerArgs = new ArrayList<>();
+        Answer<?> answer = invocation -> {
+            Method method = invocation.getMethod();
+            if (method.getName().equals("nextPlayer") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily.class})) {
+                RobotFamily currentPlayer = invocation.getArgument(0);
+                return currentPlayer == RobotFamily.SQUARE_RED ? RobotFamily.SQUARE_BLUE : RobotFamily.SQUARE_RED;
+            } else if (method.getName().equals("dropStone") && Arrays.equals(method.getParameterTypes(), new Class[] {int.class, RobotFamily[][].class, RobotFamily.class})) {
+                columnArgs.add(invocation.getArgument(0));
+                stonesArgs.add(invocation.getArgument(1));
+                currentPlayerArgs.add(invocation.getArgument(2));
+                return null;
+            } else if (method.getName().equals("testWinConditions") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily[][].class, RobotFamily.class})) {
+                return currentPlayerArgs.size() >= 5;
+            } else {
+                return invocation.callRealMethod();
+            }
+        };
+        int worldHeight = 5;
+        int worldWidth = 5;
+        try (MockedStatic<FourWins> mockedStatic = Mockito.mockStatic(FourWins.class, answer)) {
+            FourWins fourWins = new FourWins(worldWidth, worldHeight);
+            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
+            inputHandlerField.setAccessible(true);
+            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            for (int i = 0; i < 10; i++) {
+                inputHandler.addInput(i % worldWidth);
+            }
+
+            fourWins.startGame();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
 
-        return switch (robotFamilyName) {
-            case "SQUARE_RED" -> RobotFamily.SQUARE_RED;
-            case "SQUARE_BLUE" -> RobotFamily.SQUARE_BLUE;
-            default -> null;
+        RobotFamily[][] stones = null;
+        for (int i = 0; i < currentPlayerArgs.size(); i++) {
+            if (stones == null) {
+                stones = stonesArgs.get(i);
+            }
+            Context context = contextBuilder()
+                .add("world height", worldHeight)
+                .add("world width", worldWidth)
+                .add("game loop iteration", i + 1)
+                .build();
+
+            assertEquals(i % worldWidth, columnArgs.get(i), context, result ->
+                "Method dropStone was not called with correct parameter column");
+            assertSame(stones, stonesArgs.get(i), context, result ->
+                "Method dropStone was not called with correct parameter stones");
+            if (i % 2 == 0) {
+                assertEquals(RobotFamily.SQUARE_RED, currentPlayerArgs.get(i), context, result ->
+                    "Method dropStone was not called with correct parameter currentPlayer");
+            } else {
+                assertEquals(RobotFamily.SQUARE_BLUE, currentPlayerArgs.get(i), context, result ->
+                    "Method dropStone was not called with correct parameter currentPlayer");
+            }
+        }
+    }
+
+    @Test
+    public void testGameLoopCallsGetWinConditions() {
+        List<RobotFamily[][]> stonesArgs = new ArrayList<>();
+        List<RobotFamily> currentPlayerArgs = new ArrayList<>();
+        Answer<?> answer = invocation -> {
+            Method method = invocation.getMethod();
+            if (method.getName().equals("nextPlayer") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily.class})) {
+                RobotFamily currentPlayer = invocation.getArgument(0);
+                return currentPlayer == RobotFamily.SQUARE_RED ? RobotFamily.SQUARE_BLUE : RobotFamily.SQUARE_RED;
+            } else if (method.getName().equals("dropStone") && Arrays.equals(method.getParameterTypes(), new Class[] {int.class, RobotFamily[][].class, RobotFamily.class})) {
+                return null;
+            } else if (method.getName().equals("testWinConditions") && Arrays.equals(method.getParameterTypes(), new Class[] {RobotFamily[][].class, RobotFamily.class})) {
+                stonesArgs.add(invocation.getArgument(0));
+                currentPlayerArgs.add(invocation.getArgument(1));
+                return currentPlayerArgs.size() >= 5;
+            } else {
+                return invocation.callRealMethod();
+            }
         };
+        int worldHeight = 5;
+        int worldWidth = 5;
+        try (MockedStatic<FourWins> mockedStatic = Mockito.mockStatic(FourWins.class, answer)) {
+            FourWins fourWins = new FourWins(worldWidth, worldHeight);
+            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
+            inputHandlerField.setAccessible(true);
+            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            for (int i = 0; i < 10; i++) {
+                inputHandler.addInput(i % worldWidth);
+            }
+
+            fourWins.startGame();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+
+        RobotFamily[][] stones = null;
+        for (int i = 0; i < currentPlayerArgs.size(); i++) {
+            if (stones == null) {
+                stones = stonesArgs.get(i);
+            }
+            Context context = contextBuilder()
+                .add("world height", worldHeight)
+                .add("world width", worldWidth)
+                .add("game loop iteration", i + 1)
+                .build();
+
+            assertSame(stones, stonesArgs.get(i), context, result ->
+                "Method getWinConditions was not called with correct parameter stones");
+            if (i % 2 == 0) {
+                assertEquals(RobotFamily.SQUARE_RED, currentPlayerArgs.get(i), context, result ->
+                    "Method getWinConditions was not called with correct parameter currentPlayer");
+            } else {
+                assertEquals(RobotFamily.SQUARE_BLUE, currentPlayerArgs.get(i), context, result ->
+                    "Method getWinConditions was not called with correct parameter currentPlayer");
+            }
+        }
     }
 
     private void testGetDestinationRow(JsonParameterSet params, boolean testFreeSlots) {
@@ -469,6 +707,18 @@ public class FourWinsTest {
             assertEquals(expected, actual, context, result ->
                 "Method getDestinationRow returned an incorrect value");
         }
+    }
+
+    private static RobotFamily robotFamilyLookup(String robotFamilyName) {
+        if (robotFamilyName == null) {
+            return null;
+        }
+
+        return switch (robotFamilyName) {
+            case "SQUARE_RED" -> RobotFamily.SQUARE_RED;
+            case "SQUARE_BLUE" -> RobotFamily.SQUARE_BLUE;
+            default -> null;
+        };
     }
 
     private static void iterateMethodStatements(String methodName, Class<?>[] paramTypes, Consumer<Iterator<CtElement>> consumer) {
