@@ -1,0 +1,30 @@
+[
+  {
+    "sentences": [
+      "lorem ipsum dolor sit amet"
+    ],
+    "query": "lorem",
+    "expectedResult": [1]
+  },
+  {
+    "sentences": [
+      "lorem ipsum dolor sit amet"
+    ],
+    "query": "amet",
+    "expectedResult": [1]
+  },
+  {
+    "sentences": [
+      "lorem lorem lorem"
+    ],
+    "query": "lorem",
+    "expectedResult": [3]
+  },
+  {
+    "sentences": [
+      "ipsum ipsum ipsum"
+    ],
+    "query": "lorem",
+    "expectedResult": [0]
+  }
+]

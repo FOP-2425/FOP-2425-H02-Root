@@ -106,19 +106,39 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert korrekt mit einem leeren Array."
+                                "Methode occurrences: Die Methode funktioniert korrekt mit einem leeren Array.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesEmptyArray", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert mit einem Satz."
+                                "Methode occurrences: Die Methode funktioniert mit einem Satz.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesSingleSentence", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode occurrences: Die Methode funktioniert mit mehreren Sätzen."
+                                "Methode occurrences: Die Methode funktioniert mit mehreren Sätzen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testOccurrencesMultipleSentences", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode mean: Methode funktioniert mit ganzzahligen Rechenwerten."
+                                "Methode mean: Methode funktioniert mit ganzzahligen Rechenwerten.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testMeanInteger", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode mean: Die Methode funktioniert auch dann korrekt, wenn das Ergebnis eine fließkommazahl ist."
+                                "Methode mean: Die Methode funktioniert auch dann korrekt, wenn das Ergebnis eine fließkommazahl ist.",
+                                JUnitTestRef.ofMethod(
+                                    () -> TwoDimensionalArrayStuffTest.class.getDeclaredMethod(
+                                        "testMeanFloat", JsonParameterSet.class)
+                                )
                             )
                         )
                         .build()
@@ -153,31 +173,52 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn ein freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn ein freier Slot existiert.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowFreeSlot", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn KEIN freier Slot existiert."
+                                "Methode getDestinationRow: Die Rückgabe ist korrekt, wenn KEIN freier Slot existiert.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowBlockedSlot", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode getDestinationRow: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGetDestinationRowVAnforderung")
                                 ),
                                 -1
                             ),
                             criterion(
-                                "Methode dropStone: Robot wird mit korrekten Parametern erstellt."
+                                "Methode dropStone: Robot wird mit korrekten Parametern erstellt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneRobotCorrect", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
-                                "Methode dropStone: getDestinationRow wird korrekt aufgerufen."
+                                "Methode dropStone: getDestinationRow wird korrekt aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneCallsGetDestinationRow")
+                                )
                             ),
                             criterion(
-                                "Methode dropStone: Robot führt die korrekte Bewegung aus."
+                                "Methode dropStone: Robot führt die korrekte Bewegung aus.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testDropStoneMovementCorrect", JsonParameterSet.class)
+                                )
                             ),
                             criterion(
                                 "Methode dropStone: Verbindliche Anforderung 'genau eine Schleife' wurde verletzt.",
                                 JUnitTestRef.ofMethod(
-                                    () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                    () -> FourWinsTest.class.getDeclaredMethod("testDropStoneVAnforderung")
                                 ),
                                 -1
                             )
@@ -190,25 +231,25 @@ public class H02_RubricProvider implements RubricProvider {
                                 .shortDescription("Methode testWinHorizontal: ")
                                 .addChildCriteria(
                                     criterion(
-                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
-                                        JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
-                                        ),
-                                        1
-                                    ),
-                                    criterion(
                                         "Methode erkennt richtige horizontale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinHorizontal", JsonParameterSet.class)
                                         ),
                                         2
                                     ),
                                     criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinHorizontalVAnforderung1")
+                                        ),
+                                        1
+                                    ),
+                                    criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
                                         JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod("noTestYet", JsonParameterSet.class)
+                                            () -> FourWinsTest.class.getDeclaredMethod("testTestWinHorizontalVAnforderung2")
                                         ),
                                         -2
                                     )
@@ -216,39 +257,47 @@ public class H02_RubricProvider implements RubricProvider {
                             Criterion.builder()
                                 .shortDescription("Methode testWinVertical: ")
                                 .addChildCriteria(
-                                    criterion(
-                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
-                                        JUnitTestRef.ofMethod(
-                                            () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
-                                        ),
-                                        1
-                                    ),
                                     criterion(
                                         "Methode erkennt richtige vertikale Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinVertical", JsonParameterSet.class)
                                         ),
                                         2
+                                    ),
+                                    criterion(
+                                        "Methode nutzt genau zwei verschachtelte Schleifen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinVerticalVAnforderung1")
+                                        ),
+                                        1
                                     ),
                                     criterion(
                                         "Methode erkennt keine falschen Steinfolgen.",
                                         JUnitTestRef.ofMethod(
                                             () -> FourWinsTest.class.getDeclaredMethod(
-                                                "noTestYet", JsonParameterSet.class)
+                                                "testTestWinVerticalVAnforderung2")
                                         ),
                                         -2
                                     )
                                 ).minPoints(0).build(),
                             Criterion.builder()
-                                .shortDescription("Methode testWinVertical: ")
+                                .shortDescription("Methode testWinConditions: ")
                                 .addChildCriteria(
                                     criterion(
-                                        "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen."
+                                        "Die Rückgabe ist in allen Fällen korrekt.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinConditions", int.class)
+                                        )
                                     ),
                                     criterion(
-                                        "Die Rückgabe ist in allen Fällen korrekt."
+                                        "testWinHorizontal, testWinVertical und testWinDiagonal werden korrekt aufgerufen.",
+                                        JUnitTestRef.ofMethod(
+                                            () -> FourWinsTest.class.getDeclaredMethod(
+                                                "testTestWinConditionsVAnforderung")
+                                        )
                                     )
                                 ).build()
                         )
@@ -258,22 +307,46 @@ public class H02_RubricProvider implements RubricProvider {
                         .minPoints(0)
                         .addChildCriteria(
                             criterion(
-                                "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt."
+                                "Methode nextPlayer: Die Rückgabe für beide RobotFamily.SQUARE_BLUE und SQUARE_RED korrekt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testNextPlayer", boolean.class)
+                                )
                             ),
                             criterion(
-                                "Methode colorFieldBackground: Das Spielfeld wird korrekt eingefärbt."
+                                "Methode colorFieldBackground: Das Spielfeld wird korrekt eingefärbt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testColorFieldBackground", boolean.class)
+                                )
                             ),
                             criterion(
-                                "Methoden writeDrawMessage, writeWinnerMessage: Die Ausgabe in die Konsole ist korrekt."
+                                "Methoden writeDrawMessage, writeWinnerMessage: Die Ausgabe in die Konsole ist korrekt.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testWriteMessages")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: nextPlayer wird mit korrektem Parameter aufgerufen."
+                                "Methode gameLoop: nextPlayer wird mit korrektem Parameter aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsNextPlayer")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen."
+                                "Methode gameLoop: dropStone wird mit korrekten Parametern aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsDropStone")
+                                )
                             ),
                             criterion(
-                                "Methode gameLoop: testWinConditions wird mit korrekten Parametern aufgerufen."
+                                "Methode gameLoop: testWinConditions wird mit korrekten Parametern aufgerufen.",
+                                JUnitTestRef.ofMethod(
+                                    () -> FourWinsTest.class.getDeclaredMethod(
+                                        "testGameLoopCallsGetWinConditions")
+                                )
                             )
                         )
                         .build()

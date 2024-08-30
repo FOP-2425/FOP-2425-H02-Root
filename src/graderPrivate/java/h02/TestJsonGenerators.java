@@ -1,5 +1,6 @@
 package h02;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fopbot.RobotFamily;
@@ -10,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static h02.TestConstants.TEST_ITERATIONS;
@@ -163,6 +165,103 @@ public class TestJsonGenerators {
             },
             TEST_ITERATIONS,
             "fourWinsTestValidateInputRandomCases.json"
+        );
+    }
+
+    @Test
+    public void generateFourWinsTestGameBoard() throws IOException {
+        TestUtils.generateJsonTestData(
+            (mapper, index, rnd) -> {
+                int worldHeight = rnd.nextInt(5, 10);
+                int worldWidth = rnd.nextInt(5, 10);
+                // SQUARE_RED <-> true, SQUARE_BLUE <-> false, null <-> null
+                RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
+                List<Integer> firstFreeIndex = new ArrayList<>(worldWidth);  // values may exceed array index range
+                for (int col = 0; col < worldWidth; col++) {
+                    int rowsToFill = rnd.nextInt(worldHeight);
+                    for (int row = 0; row <= rowsToFill; row++) {
+                        gameBoard[row][col] = RobotFamily.SQUARE_RED;
+                    }
+                    firstFreeIndex.add(rowsToFill + 1);
+                }
+
+                ArrayNode firstFreeIndexNode = mapper.createArrayNode();
+                firstFreeIndex.stream()
+                    .map(mapper.getNodeFactory()::numberNode)
+                    .forEach(firstFreeIndexNode::add);
+
+                ArrayNode gameBoardNode = mapper.createArrayNode();
+                Arrays.stream(gameBoard)
+                    .map(gameBoardRow -> Arrays.stream(gameBoardRow)
+                        .map(rf -> mapper.getNodeFactory().textNode(rf != null ? rf.getName() : null))
+                        .toList())
+                    .forEach(gameBoardRow -> gameBoardNode.add(mapper.createArrayNode().addAll(gameBoardRow)));
+
+                ObjectNode objectNode = mapper.createObjectNode()
+                    .put("worldHeight", worldHeight)
+                    .put("worldWidth", worldWidth);
+                objectNode.set("firstFreeIndex", firstFreeIndexNode);
+                objectNode.set("gameBoard", gameBoardNode);
+
+                return objectNode;
+            },
+            TEST_ITERATIONS,
+            "FourWinsTestGameBoard.json"
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void generateFourWinsTestGameBoardWin(boolean horizontal) throws IOException {
+        TestUtils.generateJsonTestData(
+            (mapper, index, rnd) -> {
+                int worldHeight = rnd.nextInt(5, 10);
+                int worldWidth = rnd.nextInt(5, 10);
+                RobotFamily currentPlayer = rnd.nextBoolean() ? RobotFamily.SQUARE_RED : RobotFamily.SQUARE_BLUE;
+                ObjectNode objectNode = mapper.createObjectNode()
+                    .put("worldHeight", worldHeight)
+                    .put("worldWidth", worldWidth)
+                    .put("currentPlayer", currentPlayer.getName());
+
+                ArrayNode winningCoordinates = mapper.createArrayNode();
+                rnd.ints(rnd.nextInt(3), 0, horizontal ? worldHeight : worldWidth)
+                    .distinct()
+                    .forEach(i -> {
+                        if (horizontal) {
+                            winningCoordinates.add(mapper.createObjectNode()
+                                .put("x", rnd.nextInt(worldWidth - 4 + 1))
+                                .put("y", i));
+                        } else {
+                            winningCoordinates.add(mapper.createObjectNode()
+                                .put("x", i)
+                                .put("y", rnd.nextInt(worldHeight - 4 + 1)));
+                        }
+                    });
+                objectNode.set(horizontal ? "winningRowCoordinates" : "winningColCoordinates", winningCoordinates);
+
+                RobotFamily[][] gameBoard = new RobotFamily[worldHeight][worldWidth];
+                for (JsonNode node : winningCoordinates) {
+                    for (int offset = 0; offset < 4; offset++) {
+                        if (horizontal) {
+                            gameBoard[node.get("y").intValue()][node.get("x").intValue() + offset] = currentPlayer;
+                        } else {
+                            gameBoard[node.get("y").intValue() + offset][node.get("x").intValue()] = currentPlayer;
+                        }
+                    }
+                }
+
+                ArrayNode gameBoardNode = mapper.createArrayNode();
+                Arrays.stream(gameBoard)
+                    .map(gameBoardRow -> Arrays.stream(gameBoardRow)
+                        .map(rf -> mapper.getNodeFactory().textNode(rf != null ? rf.getName() : null))
+                        .toList())
+                    .forEach(gameBoardRow -> gameBoardNode.add(mapper.createArrayNode().addAll(gameBoardRow)));
+                objectNode.set("gameBoard", gameBoardNode);
+
+                return objectNode;
+            },
+            TEST_ITERATIONS,
+            "FourWinsTestGameBoard" + (horizontal ? "Horizontal" : "Vertical") + "Win.json"
         );
     }
 }

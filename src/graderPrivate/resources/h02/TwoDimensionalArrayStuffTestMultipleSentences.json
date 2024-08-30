@@ -1,0 +1,39 @@
+[
+  {
+    "sentences": [
+      "lorem ipsum dolor sit amet",
+      "consectetur adipisici elit",
+      "sed eiusmod tempor incidunt ut labore et dolore magna aliqua"
+    ],
+    "query": "lorem",
+    "expectedResult": [1, 0, 0]
+  },
+  {
+    "sentences": [
+      "lorem ipsum dolor sit amet",
+      "amet sit dolor ipsum lorem"
+    ],
+    "query": "amet",
+    "expectedResult": [1, 1]
+  },
+  {
+    "sentences": [
+      "lorem lorem lorem",
+      "lorem lorem",
+      "lorem",
+      "lorem lorem",
+      "lorem lorem lorem"
+    ],
+    "query": "lorem",
+    "expectedResult": [3, 2, 1, 2, 3]
+  },
+  {
+    "sentences": [
+      "Wenn hinter fliegenden Fliegen Fliegen fliegen dann fliegen Fliegen Fliegen nach",
+      "Fliegers Fritze fängt fliegende Fliegen fliegende Fliegen fängt Flieger Fritze",
+      "Blaukraut bleibt Blaukraut und Brautkleid bleibt Brautkleid"
+    ],
+    "query": "Fliegen",
+    "expectedResult": [4, 2, 0]
+  }
+]
