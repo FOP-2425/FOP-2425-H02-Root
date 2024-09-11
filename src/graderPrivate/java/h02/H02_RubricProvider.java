@@ -8,7 +8,6 @@ import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 
 import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
 
-
 public class H02_RubricProvider implements RubricProvider {
 
     public static final Rubric RUBRIC = Rubric.builder()

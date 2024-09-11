@@ -1,6 +1,11 @@
 package h02;
 
-import fopbot.*;
+import fopbot.Direction;
+import fopbot.Robot;
+import fopbot.RobotFamily;
+import fopbot.RobotTrace;
+import fopbot.Transition;
+import fopbot.World;
 import h02.template.InputHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -10,7 +15,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.sourcegrade.jagr.api.rubric.TestForSubmission;
-import org.tudalgo.algoutils.tutor.general.SpoonUtils;
 import org.tudalgo.algoutils.tutor.general.annotation.SkipAfterFirstFailedTest;
 import org.tudalgo.algoutils.tutor.general.assertions.Assertions2;
 import org.tudalgo.algoutils.tutor.general.assertions.Context;
@@ -18,20 +22,34 @@ import org.tudalgo.algoutils.tutor.general.assertions.PreCommentSupplier;
 import org.tudalgo.algoutils.tutor.general.assertions.ResultOfObject;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSetTest;
-import spoon.reflect.code.*;
+import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtLoop;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.*;
+import static h02.TestUtils.getCtMethod;
+import static h02.TestUtils.iterateMethodStatements;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertCallEquals;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertCallFalse;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertEquals;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertSame;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.assertTrue;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.call;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.callObject;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.contextBuilder;
+import static org.tudalgo.algoutils.tutor.general.assertions.Assertions2.emptyContext;
 
 @TestForSubmission
 @Timeout(
@@ -83,13 +101,13 @@ public class FourWinsTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "fourWinsTestValidateInput.json")
+    @JsonParameterSetTest(value = "FourWinsTestValidateInput.json")
     public void testValidateInputEdgeCases(final JsonParameterSet params) {
         testValidateInput(params);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "fourWinsTestValidateInputRandomCases.json")
+    @JsonParameterSetTest(value = "FourWinsTestValidateInputRandomCases.generated.json")
     public void testValidateInputRandomCases(final JsonParameterSet params) {
         testValidateInput(params);
     }
@@ -141,26 +159,27 @@ public class FourWinsTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoard.json")
+    @JsonParameterSetTest("FourWinsTestGameBoard.generated.json")
     public void testGetDestinationRowFreeSlot(JsonParameterSet params) {
         testGetDestinationRow(params, true);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoard.json")
+    @JsonParameterSetTest("FourWinsTestGameBoard.generated.json")
     public void testGetDestinationRowBlockedSlot(JsonParameterSet params) {
         testGetDestinationRow(params, false);
     }
 
     @Test
     public void testGetDestinationRowVAnforderung() {
-        iterateMethodStatements("getDestinationRow",
+        iterateMethodStatements(FourWins.class,
+            "getDestinationRow",
             new Class[] {int.class, RobotFamily[][].class},
             SINGLE_LOOP_VA);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoard.json")
+    @JsonParameterSetTest("FourWinsTestGameBoard.generated.json")
     public void testDropStoneRobotCorrect(JsonParameterSet params) {
         setup(params);
         List<Integer> firstFreeIndex = params.get("firstFreeIndex");
@@ -211,8 +230,8 @@ public class FourWinsTest {
 
     @Test
     public void testDropStoneCallsGetDestinationRow() {
-        CtMethod<?> dropStoneCtMethod = getCtMethod("dropStone", new Class[] {int.class, RobotFamily[][].class, RobotFamily.class});
-        CtExecutableReference<?> getDestinationRowCtExecRef = getCtMethod("getDestinationRow", new Class[] {int.class, RobotFamily[][].class})
+        CtMethod<?> dropStoneCtMethod = getCtMethod(FourWins.class, "dropStone", int.class, RobotFamily[][].class, RobotFamily.class);
+        CtExecutableReference<?> getDestinationRowCtExecRef = getCtMethod(FourWins.class, "getDestinationRow", int.class, RobotFamily[][].class)
             .getReference();
         Iterator<CtElement> iterator = dropStoneCtMethod.descendantIterator();
 
@@ -228,7 +247,7 @@ public class FourWinsTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoard.json")
+    @JsonParameterSetTest("FourWinsTestGameBoard.generated.json")
     public void testDropStoneMovementCorrect(JsonParameterSet params) {
         setup(params);
         List<Integer> firstFreeIndex = params.get("firstFreeIndex");
@@ -256,8 +275,8 @@ public class FourWinsTest {
             List<Robot> robots = World.getGlobalWorld()
                 .getAllFieldEntities()
                 .stream()
-                .filter(fieldEntity -> fieldEntity instanceof Robot)
-                .map(fieldEntity -> (Robot) fieldEntity)
+                .filter(Robot.class::isInstance)
+                .map(Robot.class::cast)
                 .toList();
             assertEquals(1, robots.size(), context, result ->
                 "Unexpected number of robots in world");
@@ -282,13 +301,14 @@ public class FourWinsTest {
 
     @Test
     public void testDropStoneVAnforderung() {
-        iterateMethodStatements("dropStone",
+        iterateMethodStatements(FourWins.class,
+            "dropStone",
             new Class[] {int.class, RobotFamily[][].class, RobotFamily.class},
             SINGLE_LOOP_VA);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoardHorizontalWin.json")
+    @JsonParameterSetTest("FourWinsTestGameBoardHorizontalWin.generated.json")
     public void testTestWinHorizontal(JsonParameterSet params) {
         setup(params);
         List<Map<String, Integer>> winningRowCoordinates = params.get("winningRowCoordinates");
@@ -302,20 +322,7 @@ public class FourWinsTest {
 
     @Test
     public void testTestWinHorizontalVAnforderung1() {
-        iterateMethodStatements("testWinHorizontal", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
-            List<CtLoop> loops = new ArrayList<>();
-
-            while (iterator.hasNext()) {
-                if (iterator.next() instanceof CtLoop ctLoop) {
-                    loops.add(ctLoop);
-                }
-            }
-
-            assertEquals(2, loops.size(), emptyContext(), result ->
-                "Method testWinHorizontal does not use exactly two loops");
-            assertTrue(loops.get(0).getBody().equals(loops.get(1).getParent()), emptyContext(), result ->
-                "Method testWinHorizontal does not use exactly two nested loops");
-        });
+        testWinVAnforderung("testWinHorizontal");
     }
 
     @Test
@@ -340,7 +347,7 @@ public class FourWinsTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest("FourWinsTestGameBoardVerticalWin.json")
+    @JsonParameterSetTest("FourWinsTestGameBoardVerticalWin.generated.json")
     public void testTestWinVertical(JsonParameterSet params) {
         setup(params);
         List<Map<String, Integer>> winningColCoordinates = params.get("winningColCoordinates");
@@ -355,20 +362,7 @@ public class FourWinsTest {
 
     @Test
     public void testTestWinVerticalVAnforderung1() {
-        iterateMethodStatements("testWinVertical", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
-            List<CtLoop> loops = new ArrayList<>();
-
-            while (iterator.hasNext()) {
-                if (iterator.next() instanceof CtLoop ctLoop) {
-                    loops.add(ctLoop);
-                }
-            }
-
-            assertEquals(2, loops.size(), emptyContext(), result ->
-                "Method testWinVertical does not use exactly two loops");
-            assertTrue(loops.get(0).getBody().equals(loops.get(1).getParent()), emptyContext(), result ->
-                "Method testWinVertical does not use exactly two nested loops");
-        });
+        testWinVAnforderung("testWinVertical");
     }
 
     @Test
@@ -392,10 +386,23 @@ public class FourWinsTest {
             "Method testWinVertical returned an incorrect value");
     }
 
+    /**
+     * Tests {@link FourWins#testWinConditions(RobotFamily[][], RobotFamily)}.
+     * The parameter {@code flags} is used to determine the return value of the win condition methods,
+     * where a set bit is interpreted as {@code true} and an unset bit as {@code false}.
+     * Only the first three bits are evaluated and correspond to the methods as follows:
+     * <ul>
+     *     <li>Bit 0: {@link FourWins#testWinHorizontal(RobotFamily[][], RobotFamily)}</li>
+     *     <li>Bit 1: {@link FourWins#testWinVertical(RobotFamily[][], RobotFamily)}</li>
+     *     <li>Bit 2: {@link FourWins#testWinDiagonal(RobotFamily[][], RobotFamily)}</li>
+     * </ul>
+     *
+     * @param flags the flags (2:0, 31:3 are unused)
+     * @throws ReflectiveOperationException if methods testWinHorizontal, testWinVertical or testWinDiagonal are not found
+     */
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
     public void testTestWinConditions(int flags) throws ReflectiveOperationException {
-        // testWinHorizontal = LSB, testWinVertical = LSB + 1, testWinDiagonal = LSB + 2
         Method testWinHorizontalMethod = FourWins.class.getDeclaredMethod("testWinHorizontal", RobotFamily[][].class, RobotFamily.class);
         Method testWinVerticalMethod = FourWins.class.getDeclaredMethod("testWinVertical", RobotFamily[][].class, RobotFamily.class);
         Method testWinDiagonalMethod = FourWins.class.getDeclaredMethod("testWinDiagonal", RobotFamily[][].class, RobotFamily.class);
@@ -433,7 +440,7 @@ public class FourWinsTest {
 
     @Test
     public void testTestWinConditionsVAnforderung() {
-        iterateMethodStatements("testWinConditions", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
+        iterateMethodStatements(FourWins.class, "testWinConditions", new Class[] {RobotFamily[][].class, RobotFamily.class}, iterator -> {
             boolean callsTestWinHorizontal = false;
             boolean callsTestWinVertical = false;
             boolean callsTestWinDiagonal = false;
@@ -558,9 +565,7 @@ public class FourWinsTest {
             int worldHeight = 5;
             int worldWidth = 5;
             FourWins fourWins = new FourWins(worldWidth, worldHeight);
-            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
-            inputHandlerField.setAccessible(true);
-            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            InputHandler inputHandler = fourWins.getInputHandler();
             for (int i = 0; i < 10; i++) {
                 inputHandler.addInput(0);
             }
@@ -581,8 +586,6 @@ public class FourWinsTest {
                         "Method nextPlayer was not called with correct parameters");
                 }
             }
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -611,16 +614,12 @@ public class FourWinsTest {
         int worldWidth = 5;
         try (MockedStatic<FourWins> mockedStatic = Mockito.mockStatic(FourWins.class, answer)) {
             FourWins fourWins = new FourWins(worldWidth, worldHeight);
-            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
-            inputHandlerField.setAccessible(true);
-            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            InputHandler inputHandler = fourWins.getInputHandler();
             for (int i = 0; i < 10; i++) {
                 inputHandler.addInput(i % worldWidth);
             }
 
             fourWins.startGame();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         }
 
         RobotFamily[][] stones = null;
@@ -671,16 +670,12 @@ public class FourWinsTest {
         int worldWidth = 5;
         try (MockedStatic<FourWins> mockedStatic = Mockito.mockStatic(FourWins.class, answer)) {
             FourWins fourWins = new FourWins(worldWidth, worldHeight);
-            java.lang.reflect.Field inputHandlerField = FourWins.class.getDeclaredField("inputHandler");
-            inputHandlerField.setAccessible(true);
-            InputHandler inputHandler = (InputHandler) inputHandlerField.get(fourWins);
+            InputHandler inputHandler = fourWins.getInputHandler();
             for (int i = 0; i < 10; i++) {
                 inputHandler.addInput(i % worldWidth);
             }
 
             fourWins.startGame();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         }
 
         RobotFamily[][] stones = null;
@@ -728,6 +723,17 @@ public class FourWinsTest {
         }
     }
 
+    private void testWinVAnforderung(String methodName) {
+        List<CtLoop> loops = getCtMethod(FourWins.class, methodName, RobotFamily[][].class, RobotFamily.class)
+            .filterChildren(CtLoop.class::isInstance)
+            .list();
+
+        assertEquals(2, loops.size(), emptyContext(), result ->
+            "Method %s does not use exactly two loops".formatted(methodName));
+        assertTrue(loops.get(0).getBody().equals(loops.get(1).getParent()), emptyContext(), result ->
+            "Method %s does not use exactly two nested loops".formatted(methodName));
+    }
+
     private static RobotFamily robotFamilyLookup(String robotFamilyName) {
         if (robotFamilyName == null) {
             return null;
@@ -738,28 +744,5 @@ public class FourWinsTest {
             case "SQUARE_BLUE" -> RobotFamily.SQUARE_BLUE;
             default -> null;
         };
-    }
-
-    private static void iterateMethodStatements(String methodName, Class<?>[] paramTypes, Consumer<Iterator<CtElement>> consumer) {
-        Iterator<CtElement> iterator = getCtMethod(methodName, paramTypes)
-            .getBody()
-            .descendantIterator();
-        consumer.accept(iterator);
-    }
-
-    private static CtMethod<?> getCtMethod(String methodName, Class<?>[] paramTypes) {
-        return SpoonUtils.getType(FourWins.class.getName())
-            .getMethodsByName(methodName)
-            .stream()
-            .filter(ctMethod -> {
-                List<CtParameter<?>> parameters = ctMethod.getParameters();
-                boolean result = parameters.size() == paramTypes.length;
-                for (int i = 0; result && i < parameters.size(); i++) {
-                    result = parameters.get(i).getType().getQualifiedName().equals(paramTypes[i].getTypeName());
-                }
-                return result;
-            })
-            .findAny()
-            .orElseThrow();
     }
 }

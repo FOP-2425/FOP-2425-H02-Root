@@ -40,7 +40,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             TEST_ITERATIONS,
-            "OneDimensionalArrayStuffTestPushRandomNumbers.json"
+            "OneDimensionalArrayStuffTestPushRandomNumbers.generated.json"
         );
     }
 
@@ -71,7 +71,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             TEST_ITERATIONS,
-            "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers" + (twoPositivesOnly ? "TwoPositiveNumbersOnly" : "") + ".json"
+            "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers" + (twoPositivesOnly ? "TwoPositiveNumbersOnly" : "") + ".generated.json"
         );
     }
 
@@ -109,7 +109,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             smallerThanTwo ? 2 : TEST_ITERATIONS,
-            "OneDimensionalArrayStuffTestFibonacciRandomNumbers" + (smallerThanTwo ? "SmallerThanTwo" : "") + ".json"
+            "OneDimensionalArrayStuffTestFibonacciRandomNumbers" + (smallerThanTwo ? "SmallerThanTwo" : "") + ".generated.json"
         );
     }
 
@@ -164,7 +164,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             TEST_ITERATIONS,
-            "fourWinsTestValidateInputRandomCases.json"
+            "FourWinsTestValidateInputRandomCases.generated.json"
         );
     }
 
@@ -206,7 +206,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             TEST_ITERATIONS,
-            "FourWinsTestGameBoard.json"
+            "FourWinsTestGameBoard.generated.json"
         );
     }
 
@@ -261,7 +261,7 @@ public class TestJsonGenerators {
                 return objectNode;
             },
             TEST_ITERATIONS,
-            "FourWinsTestGameBoard" + (horizontal ? "Horizontal" : "Vertical") + "Win.json"
+            "FourWinsTestGameBoard" + (horizontal ? "Horizontal" : "Vertical") + "Win.generated.json"
         );
     }
 }
