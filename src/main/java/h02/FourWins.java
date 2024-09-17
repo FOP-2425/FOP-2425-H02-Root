@@ -367,6 +367,16 @@ public class FourWins {
     }
 
     /**
+     * Returns this instance's {@link InputHandler}.
+     *
+     * @return the input handler
+     */
+    @DoNotTouch
+    public InputHandler getInputHandler() {
+        return inputHandler;
+    }
+
+    /**
      * Returns {@code true} when the game is finished, {@code false} otherwise.
      *
      * @return whether the game is finished.

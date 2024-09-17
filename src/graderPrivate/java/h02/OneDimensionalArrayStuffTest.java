@@ -202,43 +202,43 @@ public class OneDimensionalArrayStuffTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.generated.json")
     public void testPushLastElementCorrect(final JsonParameterSet params) {
         testPush(params, true, false);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.generated.json")
     public void testPushAllElementsCorrect(final JsonParameterSet params) {
         testPush(params, false, false);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestPushRandomNumbers.generated.json")
     public void testPushOriginalArrayUnchanged(final JsonParameterSet params) {
         testPush(params, false, true);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbersTwoPositiveNumbersOnly.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbersTwoPositiveNumbersOnly.generated.json")
     public void testCalculateNextFibonacciPositiveOnly(final JsonParameterSet params) {
         testCalculateNextFibonacci(params, false);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers.generated.json")
     public void testCalculateNextFibonacciAllNumbers(final JsonParameterSet params) {
         testCalculateNextFibonacci(params, false);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestCalculateNextFibonacciRandomNumbers.generated.json")
     public void testCalculateNextFibonacciVanforderungen(final JsonParameterSet params) {
         testCalculateNextFibonacci(params, true);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.generated.json")
     public void testFibonacciVanforderungen(final JsonParameterSet params) {
         testFibonacci(params, true);
     }
@@ -314,13 +314,13 @@ public class OneDimensionalArrayStuffTest {
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbersSmallerThanTwo.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbersSmallerThanTwo.generated.json")
     public void testFibonacciSmallerThanTwo(final JsonParameterSet params) {
         testFibonacci(params, false);
     }
 
     @ParameterizedTest
-    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.json")
+    @JsonParameterSetTest(value = "OneDimensionalArrayStuffTestFibonacciRandomNumbers.generated.json")
     public void testFibonacciBigNumbers(final JsonParameterSet params) {
         testFibonacci(params, false);
     }
