@@ -130,7 +130,7 @@ public class Main {
     /**
      * Perform sanity checks for exercise H2.2
      */
-    @StudentImplementationRequired("H2.3")
+    @StudentImplementationRequired("H2.4")
     public static void sanityChecksH22() {
         // setting world size
         World.setSize(4, 5);
