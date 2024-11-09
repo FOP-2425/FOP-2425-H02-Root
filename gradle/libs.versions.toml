@@ -3,4 +3,4 @@ algomate = { id = "org.tudalgo.algomate", version = "0.7.1" }
 style = { id = "org.sourcegrade.style", version = "3.0.0" }
 
 [libraries]
-fopbot = { module = "org.tudalgo:fopbot", version = "0.8.0" }
+fopbot = { module = "org.tudalgo:fopbot", version = "0.8.1" }
