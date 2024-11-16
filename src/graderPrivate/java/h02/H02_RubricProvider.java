@@ -4,6 +4,7 @@ import org.sourcegrade.jagr.api.rubric.Criterion;
 import org.sourcegrade.jagr.api.rubric.JUnitTestRef;
 import org.sourcegrade.jagr.api.rubric.Rubric;
 import org.sourcegrade.jagr.api.rubric.RubricProvider;
+import org.sourcegrade.jagr.api.testing.RubricConfiguration;
 import org.tudalgo.algoutils.tutor.general.json.JsonParameterSet;
 
 import static org.tudalgo.algoutils.tutor.general.jagr.RubricUtils.criterion;
@@ -359,8 +360,8 @@ public class H02_RubricProvider implements RubricProvider {
         return RUBRIC;
     }
 
-//    @Override
-//    public void configure(final RubricConfiguration configuration) {
-//        configuration.addTransformer(new AccessTransformer());
-//    }
+    @Override
+    public void configure(RubricConfiguration configuration) {
+        configuration.addTransformer(new SubmissionTransformer());
+    }
 }
